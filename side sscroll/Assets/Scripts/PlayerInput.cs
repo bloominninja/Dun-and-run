@@ -35,6 +35,11 @@ public class PlayerInput : MonoBehaviour
 			amountToMove.y=0;
 			RJumps=jumps;
 		}	
+		if(playerPhysics.stopMove)
+		{
+			targetSpeed=0;
+			currentSpeed=0;
+		}
 		if(Input.GetButtonDown ("Jump")&&RJumps>0)
 			{
 				amountToMove.y=jumpHeight;
