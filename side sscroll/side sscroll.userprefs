@@ -1,9 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerPhysics.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerInput.cs">
     <Files>
-      <File FileName="Assets\Scripts\PlayerPhysics.cs" Line="95" Column="54" />
-      <File FileName="Assets\Scripts\PlayerInput.cs" Line="41" Column="19" />
+      <File FileName="Assets\Scripts\PlayerInput.cs" Line="22" Column="1" />
+      <File FileName="Assets\Scripts\PlayerPhysics.cs" Line="70" Column="18" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

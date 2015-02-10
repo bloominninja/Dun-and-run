@@ -15,8 +15,12 @@ public class PlayerPhysics : MonoBehaviour
 
 	[HideInInspector]
 	public bool grounded;
+
 	[HideInInspector]
 	public bool stopMove;
+
+	[HideInInspector]
+	public bool touchWall;
 
 	Ray ray;
 	RaycastHit hit;
@@ -28,6 +32,7 @@ public class PlayerPhysics : MonoBehaviour
 	}
 public void Move(Vector2 moveAmount)
 	{
+
 		float deltaY=moveAmount.y;
 		float deltaX=moveAmount.x;
 		Vector2 p=transform.position;
@@ -62,6 +67,7 @@ public void Move(Vector2 moveAmount)
 	
 	//Check Left/Right
 		stopMove=false;
+		touchWall=false;
 		for(int i=0;i<3;i++)
 		{
 			float dir=Mathf.Sign(deltaX);
@@ -81,9 +87,12 @@ public void Move(Vector2 moveAmount)
 				else
 				{
 					deltaX=0;
+
 					
 				}
 				stopMove=true;
+				touchWall=true;
+
 				//grounded=true;
 				break;
 			}

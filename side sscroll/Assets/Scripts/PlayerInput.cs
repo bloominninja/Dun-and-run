@@ -17,12 +17,15 @@ public class PlayerInput : MonoBehaviour
 			private Vector2 amountToMove;
 			private float RJumps;
 			private PlayerPhysics playerPhysics;
+			private bool right;
+			private bool wallJump;
+
 	
 
 	void Start () {
 
 		playerPhysics=GetComponent<PlayerPhysics>();
-
+		//right=true;
 	}
 	
 	
@@ -30,20 +33,57 @@ public class PlayerInput : MonoBehaviour
 	{
 		targetSpeed=Input.GetAxisRaw("Horizontal")*speed;
 		currentSpeed =IncrementTowards(currentSpeed,targetSpeed,acceleration);
+
 		if(playerPhysics.grounded)
 		{
 			amountToMove.y=0;
 			RJumps=jumps;
+			wallJump=false;
 		}	
 		if(playerPhysics.stopMove)
 		{
+			if (currentSpeed>0)
+			{
+				right=true;
+				Debug.Log("right");
+			}
+			else if (currentSpeed<0)
+			{
+				right=false;
+				Debug.Log("left");
+			}
+			if(!playerPhysics.grounded)
+			{
+				wallJump=true;
+			}
 			targetSpeed=0;
 			currentSpeed=0;
+
 		}
-		if(Input.GetButtonDown ("Jump")&&RJumps>0)
+		if(Input.GetButtonDown ("Jump"))
 			{
+
+			if(wallJump)
+				{
+				if(right)
+				{
+					currentSpeed=-18;
+					right=false;
+				}
+				else
+				{
+					currentSpeed=18;
+					right=true;
+				}
+				amountToMove.y=jumpHeight;
+
+				}
+			if((RJumps>0)&&wallJump==false)
+				{
 				amountToMove.y=jumpHeight;
 				RJumps-=1;
+				}
+			wallJump=false;
 		}
 
 		amountToMove.x=currentSpeed;
