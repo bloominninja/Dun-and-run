@@ -1,25 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(PlayerPhysics))]
-public class PlayerInput : MonoBehaviour
+[RequireComponent(typeof(CustomPhysics))]
+[RequireComponent(typeof(CustomAnimator))]
+public class PlayerController : MonoBehaviour
 {
-    //Player Handling
     //Public Values
     public float speed = 8;
-    public float acceleration = 12;
-    public float gravity = 20;
+    public Vector2 s;
     public float jumpHeight = 12;
-    public float jumps = 1;
+    public int maxHealth = 6;
+    public int currentHealth = 6;
+    public int maxMagic = 100;
+    public int currentMagic = 100;
+    //public ActiveItem* active1;
+    //public ActiveItem* active2;
+    //public Item* passives;
+
     //Private Values
-    private float currentSpeed;
-    private float targetSpeed;
-    private Vector2 amountToMove;
-    private float RJumps;
-    private PlayerPhysics playerPhysics;
-    private bool right;
-    private bool wallJump;
-    //
+    private CustomPhysics physics;
+
     //input-focused variables
     public string inputType = "Keyboard";
     //input string variables, use any of the strings in the Input Manager
@@ -44,8 +44,7 @@ public class PlayerInput : MonoBehaviour
 
     void Start ()
     {
-        playerPhysics = GetComponent<PlayerPhysics>();
-        //right=true;
+        physics = GetComponent<CustomPhysics>();
 
         if (inputType == "Keyboard")
         {
@@ -122,6 +121,48 @@ public class PlayerInput : MonoBehaviour
     void Update ()
     {
         if (Left())
+            s.x = -speed;
+        else if (Right())
+            s.x = speed;
+        else
+            s.x = 0;
+
+        if (Jump())
+        {
+            s.y = jumpHeight / 2;
+        }
+        else
+        {
+            s.y = 0;
+        }
+
+        if (physics.collideBottom)
+        {
+            if (JumpPressed())
+                physics.SetSpeedY(jumpHeight, 0.15f);
+        }
+        else if (physics.collideRight)
+        {
+            if (JumpPressed())
+            {
+                physics.SetSpeedX(-speed, 0.15f);
+                physics.SetSpeedY(jumpHeight, 0.15f);
+            }
+        }
+        else if (physics.collideLeft)
+        {
+            if (JumpPressed())
+            {
+                physics.SetSpeedX(speed, 0.15f);
+                physics.SetSpeedY(jumpHeight, 0.15f);
+            }
+        }
+
+        physics.Move(s);
+
+
+        /*
+        if (Left())
             targetSpeed = -speed;
         else if (Right())
             targetSpeed = speed;
@@ -185,15 +226,15 @@ public class PlayerInput : MonoBehaviour
         amountToMove.x = currentSpeed;
         amountToMove.y -= gravity * Time.deltaTime;
         playerPhysics.Move(amountToMove * Time.deltaTime);
-
+        */
         prevLeft = Left();
         prevRight = Right();
         prevUp = Up();
         prevDown = Down();
-        if (inputType == "Keyboard")
+        if (inputType != "Keyboard")
             prevSpecial = Special();
     }
-    
+    /*
     private float IncrementTowards (float n, float target, float a)
     {
         if (n == target)
@@ -214,8 +255,9 @@ public class PlayerInput : MonoBehaviour
                 return target;
             }
         }
-    }
-    
+    }*/
+
+    #region Input Functions
     private bool Left ()
     {
         if (Input.GetAxis(horizontal) < 0)
@@ -462,4 +504,5 @@ public class PlayerInput : MonoBehaviour
     {
         return Input.GetButtonUp(select);
     }
+    #endregion
 }
