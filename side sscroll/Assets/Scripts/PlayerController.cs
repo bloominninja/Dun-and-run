@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(CustomPhysics))]
 [RequireComponent(typeof(CustomAnimator))]
@@ -13,9 +14,12 @@ public class PlayerController : MonoBehaviour
     public int currentHealth = 6;
     public int maxMagic = 100;
     public int currentMagic = 100;
-    //public ActiveItem* active1;
-    //public ActiveItem* active2;
-    //public Item* passives;
+    public ActiveItem active1;
+    public ActiveItem active2;
+    public LinkedList<Item> passives;
+    [HideInInspector]
+    protected LinkedListNode<Item>
+        p;
 
     //protected Values
     protected CustomPhysics physics;
@@ -41,10 +45,14 @@ public class PlayerController : MonoBehaviour
     protected bool prevUp = false;
     protected bool prevDown = false;
     protected bool prevSpecial = false;
+    [HideInInspector]
+    public bool
+        grab = false;
 
     void Start ()
     {
         physics = GetComponent<CustomPhysics>();
+        passives = new LinkedList<Item>();
 
         if (inputType == "Keyboard")
         {
@@ -158,6 +166,23 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        grab = false;
+        if (Grab1Pressed() || Grab2Pressed())
+            grab = true;
+
+        p = passives.First;
+        while (p!=null)
+        {
+            p.Value.Tick(this);
+            p = p.Next;
+        }
+
+        if (active1 != null)
+            active1.Tick();
+        if (active2 != null)
+            active2.Tick();
+
+
         physics.Move(s);
 
 
@@ -234,6 +259,7 @@ public class PlayerController : MonoBehaviour
         if (inputType != "Keyboard")
             prevSpecial = Special();
     }
+
     /*
     protected float IncrementTowards (float n, float target, float a)
     {
@@ -257,7 +283,7 @@ public class PlayerController : MonoBehaviour
         }
     }*/
 
-    public void Bounce (GameObject other, Vector2 sp)
+    public virtual void Bounce (GameObject other, Vector2 sp)
     {
         if (sp.x != 0)
         {
@@ -265,6 +291,58 @@ public class PlayerController : MonoBehaviour
         }
         else if (sp.y != 0)
             physics.SetSpeedY(sp.y, 0.2f);
+    }
+    
+    public virtual bool Pickup (Item item)
+    {
+        passives.AddLast(item);
+        item.OnPickup(this);
+        return true;
+    }
+
+    public virtual bool Pickup (ActiveItem item)
+    {
+        if (Grab1Pressed())
+        {
+            if (active1 != null)
+                Drop(active1);
+            active1 = item;
+            item.OnPickup(this);
+            return true;
+        }
+        else if (Grab2Pressed())
+        {
+            if (active2 != null)
+                Drop(active2);
+            active2 = item;
+            item.OnPickup(this);
+            return true;
+        }
+        return false;
+    }
+    
+    public virtual bool Drop (Item item)
+    {
+        item.OnDrop(this);
+        passives.Remove(item);
+        return true;
+    }
+
+    public virtual bool Drop (ActiveItem item)
+    {
+        if (active1 == item)
+        {
+            item.OnDrop(this);
+            active1 = null;
+            return true;
+        }
+        else if (active2 == item)
+        {
+            item.OnDrop(this);
+            active2 = null;
+            return true;
+        }
+        return false;
     }
 
     #region Input Functions

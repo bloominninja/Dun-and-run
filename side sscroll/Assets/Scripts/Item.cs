@@ -4,39 +4,62 @@ using System.Collections;
 [RequireComponent(typeof(CustomPhysics))]
 public class Item : MonoBehaviour
 {
-    private CustomPhysics physics;
+    protected CustomPhysics physics;
+    protected PlayerController[] players;
+    protected bool held = false;
+    [HideInInspector]
+    protected int
+        i;
+    [HideInInspector]
+    protected BoxCollider2D
+        box;
+
     // Use this for initialization
-    void Start ()
+    protected virtual void Start ()
     {
         physics = GetComponent<CustomPhysics>();
+        players = (PlayerController[])FindObjectsOfType(typeof(PlayerController));
+        box = GetComponent<BoxCollider2D>();
     }
 	
     // Update is called once per frame
-    void Update ()
+    protected virtual void Update ()
     {
-        physics.Move(new Vector2(0, 0));
+        if (!held)
+            physics.Move(Vector2.zero);
     }
 
-    void Pickup ()
+    protected virtual void LateUpdate ()
     {
+        if (!held)
+        {
+            for (i=0; i<players.Length; i++)
+            {
+                if (collider2D.bounds.Intersects(players[i].collider2D.bounds))
+                {
+                    if (players[i].Pickup(this))
+                        break;
+                }
+            }
+        }
 
     }
 
-    void Drop ()
+    public virtual void OnPickup (PlayerController player)
     {
-
+        held = true;
+        renderer.enabled = false;
     }
 
-    void Tick ()
+    public virtual void OnDrop (PlayerController player)
     {
-
+        held = false;
+        renderer.enabled = true;
+        transform.position = player.transform.position;
     }
-}
 
-public class ActiveItem : Item
-{
-    void Activate ()
+    public virtual void Tick (PlayerController player)
     {
-        
+        //Debug.Log("hi there, I'm an item.");
     }
 }

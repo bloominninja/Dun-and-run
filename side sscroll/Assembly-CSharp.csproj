@@ -46,8 +46,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\ActiveItem.cs" />
      <Compile Include="Assets\Scripts\CustomAnimator.cs" />
      <Compile Include="Assets\Scripts\CustomPhysics.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\HeartContainer.cs" />
      <Compile Include="Assets\Scripts\Item.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\PlayerPhysics.cs" />
