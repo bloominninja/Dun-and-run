@@ -1,9 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerController.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerPhysics.cs">
     <Files>
-      <File FileName="Assets\Scripts\CustomPhysics.cs" Line="18" Column="29" />
+      <File FileName="Assets\Scripts\PlayerPhysics.cs" Line="90" Column="54" />
+      <File FileName="Assets\Scripts\CustomPhysics.cs" Line="14" Column="31" />
       <File FileName="Assets\Scripts\PlayerController.cs" Line="16" Column="34" />
+      <File FileName="Assets\Scripts\Projectile.cs" Line="6" Column="32" />
+      <File FileName="Assets\Scripts\ProjectilePhysics.cs" Line="2" Column="26" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

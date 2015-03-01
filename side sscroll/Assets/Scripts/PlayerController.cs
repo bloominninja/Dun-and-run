@@ -17,30 +17,30 @@ public class PlayerController : MonoBehaviour
     //public ActiveItem* active2;
     //public Item* passives;
 
-    //Private Values
-    private CustomPhysics physics;
+    //protected Values
+    protected CustomPhysics physics;
 
     //input-focused variables
     public string inputType = "Keyboard";
     //input string variables, use any of the strings in the Input Manager
     //can be changed on the fly to rebind keys and set up control devices
-    private string horizontal;
-    private string vertical;
-    private string jump;
-    private string attack;
-    private string special;
-    private string item1;
-    private string item2;
-    private string grab1;
-    private string grab2;
-    private string pause;
-    private string select;
+    protected string horizontal;
+    protected string vertical;
+    protected string jump;
+    protected string attack;
+    protected string special;
+    protected string item1;
+    protected string item2;
+    protected string grab1;
+    protected string grab2;
+    protected string pause;
+    protected string select;
     //axis-focused variables; used for pressed and released functions
-    private bool prevLeft = false;
-    private bool prevRight = false;
-    private bool prevUp = false;
-    private bool prevDown = false;
-    private bool prevSpecial = false;
+    protected bool prevLeft = false;
+    protected bool prevRight = false;
+    protected bool prevUp = false;
+    protected bool prevDown = false;
+    protected bool prevSpecial = false;
 
     void Start ()
     {
@@ -235,7 +235,7 @@ public class PlayerController : MonoBehaviour
             prevSpecial = Special();
     }
     /*
-    private float IncrementTowards (float n, float target, float a)
+    protected float IncrementTowards (float n, float target, float a)
     {
         if (n == target)
         {
@@ -257,8 +257,18 @@ public class PlayerController : MonoBehaviour
         }
     }*/
 
+    public void Bounce (GameObject other, Vector2 sp)
+    {
+        if (sp.x != 0)
+        {
+            physics.SetSpeedX(sp.x, 0.2f);
+        }
+        else if (sp.y != 0)
+            physics.SetSpeedY(sp.y, 0.2f);
+    }
+
     #region Input Functions
-    private bool Left ()
+    protected bool Left ()
     {
         if (Input.GetAxis(horizontal) < 0)
             return true;
@@ -266,7 +276,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool LeftPressed ()
+    protected bool LeftPressed ()
     {
         if (prevLeft == false && Left())
             return true;
@@ -274,7 +284,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool LeftReleased ()
+    protected bool LeftReleased ()
     {
         if (prevLeft == true && !Left())
             return true;
@@ -282,7 +292,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    private bool Right ()
+    protected bool Right ()
     {
         if (Input.GetAxis(horizontal) > 0)
             return true;
@@ -290,7 +300,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool RightPressed ()
+    protected bool RightPressed ()
     {
         if (prevRight == false && Right())
             return true;
@@ -298,7 +308,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool RightReleased ()
+    protected bool RightReleased ()
     {
         if (prevRight == true && !Right())
             return true;
@@ -306,7 +316,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    private bool Up ()
+    protected bool Up ()
     {
         if (Input.GetAxis(vertical) > 0)
             return true;
@@ -314,7 +324,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool UpPressed ()
+    protected bool UpPressed ()
     {
         if (prevUp == false && Up())
             return true;
@@ -322,7 +332,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool UpReleased ()
+    protected bool UpReleased ()
     {
         if (prevUp == true && !Up())
             return true;
@@ -330,7 +340,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    private bool Down ()
+    protected bool Down ()
     {
         if (Input.GetAxis(vertical) < 0)
             return true;
@@ -338,7 +348,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool DownPressed ()
+    protected bool DownPressed ()
     {
         if (prevDown == false && Down())
             return true;
@@ -346,7 +356,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool DownReleased ()
+    protected bool DownReleased ()
     {
         if (prevDown == true && !Down())
             return true;
@@ -354,37 +364,37 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    private bool Jump ()
+    protected bool Jump ()
     {
         return Input.GetButton(jump);
     }
     
-    private bool JumpPressed ()
+    protected bool JumpPressed ()
     {
         return Input.GetButtonDown(jump);
     }
     
-    private bool JumpReleased ()
+    protected bool JumpReleased ()
     {
         return Input.GetButtonUp(jump);
     }
 
-    private bool Attack ()
+    protected bool Attack ()
     {
         return Input.GetButton(attack);
     }
     
-    private bool AttackPressed ()
+    protected bool AttackPressed ()
     {
         return Input.GetButtonDown(attack);
     }
     
-    private bool AttackReleased ()
+    protected bool AttackReleased ()
     {
         return Input.GetButtonUp(attack);
     }
 
-    private bool Special ()
+    protected bool Special ()
     {
         if (inputType == "Keyboard")
             return Input.GetButton(special);
@@ -395,7 +405,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    private bool SpecialPressed ()
+    protected bool SpecialPressed ()
     {
         if (inputType == "Keyboard")
             return Input.GetButtonDown(special);
@@ -405,7 +415,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    private bool SpecialReleased ()
+    protected bool SpecialReleased ()
     {
         if (inputType == "Keyboard")
             return Input.GetButtonUp(special);
@@ -415,92 +425,92 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    private bool Item1 ()
+    protected bool Item1 ()
     {
         return Input.GetButton(item1);
     }
     
-    private bool Item1Pressed ()
+    protected bool Item1Pressed ()
     {
         return Input.GetButtonDown(item1);
     }
     
-    private bool Item1Released ()
+    protected bool Item1Released ()
     {
         return Input.GetButtonUp(item1);
     }
 
-    private bool Item2 ()
+    protected bool Item2 ()
     {
         return Input.GetButton(item2);
     }
     
-    private bool Item2Pressed ()
+    protected bool Item2Pressed ()
     {
         return Input.GetButtonDown(item2);
     }
     
-    private bool Item2Released ()
+    protected bool Item2Released ()
     {
         return Input.GetButtonUp(item2);
     }
 
-    private bool Grab1 ()
+    protected bool Grab1 ()
     {
         return Input.GetButton(grab1);
     }
     
-    private bool Grab1Pressed ()
+    protected bool Grab1Pressed ()
     {
         return Input.GetButtonDown(grab1);
     }
     
-    private bool Grab1Released ()
+    protected bool Grab1Released ()
     {
         return Input.GetButtonUp(grab1);
     }
 
-    private bool Grab2 ()
+    protected bool Grab2 ()
     {
         return Input.GetButton(grab2);
     }
     
-    private bool Grab2Pressed ()
+    protected bool Grab2Pressed ()
     {
         return Input.GetButtonDown(grab2);
     }
     
-    private bool Grab2Released ()
+    protected bool Grab2Released ()
     {
         return Input.GetButtonUp(grab2);
     }
 
-    private bool Pause ()
+    protected bool Pause ()
     {
         return Input.GetButton(pause);
     }
     
-    private bool PausePressed ()
+    protected bool PausePressed ()
     {
         return Input.GetButtonDown(pause);
     }
     
-    private bool PauseReleased ()
+    protected bool PauseReleased ()
     {
         return Input.GetButtonUp(pause);
     }
 
-    private bool Select ()
+    protected bool Select ()
     {
         return Input.GetButton(select);
     }
     
-    private bool SelectPressed ()
+    protected bool SelectPressed ()
     {
         return Input.GetButtonDown(select);
     }
     
-    private bool SelectReleased ()
+    protected bool SelectReleased ()
     {
         return Input.GetButtonUp(select);
     }

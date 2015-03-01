@@ -5,40 +5,47 @@ using System.Collections;
 public class CustomPhysics : MonoBehaviour
 {
     //public LayerMask collisionMask = 8;
-    private BoxCollider2D box;
-    private Vector2 siz;
-    private Vector2 cen;
+    protected BoxCollider2D box;
+    protected Vector2 siz;
+    protected Vector2 cen;
     //NEVER CHANGE BELOW LINE OR UNITY COMPILE FUNNY
-    private float skin = 0.005f;
+    protected float skin = 0.005f;
     public Vector2 speed;
     public float gravity = 20;
     public bool gravEnabled = true;
+    public float friction = 5;
     public bool lockX;
     public bool lockY;
-    private float lockXTime;
-    private float lockYTime;
+    protected float lockXTime;
+    protected float lockYTime;
     public bool collideRight, collideLeft, collideTop, collideBottom;
+    public string collLayer1 = "Terrain";
+    public string collLayer2;
+    public string collLayer3;
     [HideInInspector]
-    private bool
+    protected bool
         collide;
     [HideInInspector]
-    private Ray2D
+    protected Ray2D
         ray;
     [HideInInspector]
-    private RaycastHit2D
-        hit;
+    protected RaycastHit2D[]
+        hits;
     [HideInInspector]
-    private Vector2
-        o, d;
+    protected Vector2
+        o, d, sp;
+    [HideInInspector]
+    protected int
+        i, i2, originalLayer;
 
-    void Start ()
+    protected virtual void Start ()
     {
         box = GetComponent<BoxCollider2D>();
         siz = box.size;
         cen = box.center;
     }
 
-    void Update ()
+    protected virtual void Update ()
     {
         if (lockX)
         {
@@ -56,15 +63,12 @@ public class CustomPhysics : MonoBehaviour
 
     public void Move (Vector2 target)
     {
-        collide = false;
-        collideRight = false;
-        collideLeft = false;
-        collideTop = false;
-        collideBottom = false;
-
         if (!lockX)
         {
-            speed.x = Accelerate(speed.x, target.x);
+            if (collideBottom && ((target.x == 0 && Mathf.Abs(speed.x) > 1) || (target.x != 0 && Mathf.Sign(speed.x) != Mathf.Sign(target.x))))
+                speed.x = Accelerate(speed.x, target.x - friction * Mathf.Sign(speed.x));
+            else
+                speed.x = Accelerate(speed.x, target.x);
         }
         if (!lockY)
         {
@@ -73,40 +77,31 @@ public class CustomPhysics : MonoBehaviour
             else
                 speed.y = Accelerate(speed.y, target.y);
         }
-        Vector2 sp = speed * Time.deltaTime;
+        sp = speed * Time.deltaTime;
+        
+        collide = false;
+        collideRight = false;
+        collideLeft = false;
+        collideTop = false;
+        collideBottom = false;
 
+        originalLayer = gameObject.layer;
+        gameObject.layer = 2;
         #region Vertical Collisions
         //check for vertical collision
         if (sp.y != 0)
         {
-            for (int i=0; i<3; i++)
+            for (i=0; i<3; i++)
             {
                 d.Set(0, Mathf.Sign(sp.y));
                 o.Set((transform.position.x + cen.x - siz.x / 2) + siz.x / 2 * i, transform.position.y + cen.y + siz.y / 2 * d.y);
                 ray = new Ray2D(o, d);
                 Debug.DrawRay(ray.origin, ray.direction);
-                hit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Abs(sp.y) + skin, LayerMask.GetMask("Terrain"));
-                if (hit)
+                hits = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Abs(sp.y) + skin, LayerMask.GetMask(collLayer1, collLayer2, collLayer3));
+                if (hits.Length != 0)
                 {
-                    collide = true;
-                    if (ray.direction.y == 1)
-                        collideTop = true;
-                    else
-                        collideBottom = true;
-                    lockY = false;
-
-                    float dst = Vector3.Distance(ray.origin, hit.point);
-                    if (dst > skin)
-                    {
-                        speed.y = 0;
-                        sp.y = dst * ray.direction.y - skin * ray.direction.y;
-                    }
-                    else
-                    {
-                        speed.y = 0;
-                        sp.y = 0; 
-                    }
-                    break;
+                    if (CollideV())
+                        break;
                 }
             }
         }
@@ -116,34 +111,17 @@ public class CustomPhysics : MonoBehaviour
         //check for horizontal collision
         if (sp.x != 0)
         {
-            for (int i=0; i<3; i++)
+            for (i=0; i<3; i++)
             {
                 d.Set(Mathf.Sign(sp.x), 0);
                 o.Set(transform.position.x + cen.x + siz.x / 2 * d.x, (transform.position.y + cen.y - siz.y / 2) + siz.y / 2 * i);
                 ray = new Ray2D(o, d);
                 Debug.DrawRay(ray.origin, ray.direction);
-                hit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Abs(sp.x) + skin, LayerMask.GetMask("Terrain"));
-                if (hit.collider != null)
+                hits = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Abs(sp.x) + skin, LayerMask.GetMask(collLayer1, collLayer2, collLayer3));
+                if (hits.Length != 0)
                 {
-                    collide = true;
-                    if (ray.direction.x == 1)
-                        collideRight = true;
-                    else
-                        collideLeft = true;
-                    lockX = false;
-
-                    float dst = Vector2.Distance(ray.origin, hit.point);
-                    if (dst > skin)
-                    {
-                        speed.x = 0;
-                        sp.x = dst * ray.direction.x - skin * ray.direction.x;
-                    }
-                    else
-                    {
-                        speed.x = 0;
-                        sp.x = 0;
-                    }
-                    break;
+                    if (CollideH())
+                        break;
                 }
             }
         }
@@ -151,19 +129,20 @@ public class CustomPhysics : MonoBehaviour
 
         #region Digonal Collision
         //check for diagonal collisions
-        if (!collide && sp != 0)
+        if (!collide && sp.x != 0 && sp.y != 0)
         {
             o.Set(transform.position.x + cen.x + siz.x / 2 * Mathf.Sign(sp.x), transform.position.y + cen.y + siz.y / 2 * Mathf.Sign(sp.y));
             d.Set(sp.normalized.x, sp.normalized.y);
             ray = new Ray2D(o, d);
-            if (Physics2D.Raycast(ray.origin, ray.direction, Mathf.Sqrt(Mathf.Pow(sp.x, 2) + Mathf.Pow(sp.y, 2)), LayerMask.GetMask("Terrain")))
+            Debug.DrawRay(ray.origin, ray.direction);
+            hits = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Sqrt(Mathf.Pow(sp.x, 2) + Mathf.Pow(sp.y, 2)), LayerMask.GetMask(collLayer1, collLayer2, collLayer3));
+            if (hits.Length != 0)
             {
-                collideBottom = true;
-                speed.y = 0;
-                sp.y = 0;
+                CollideD();
             }
         }
         #endregion
+        gameObject.layer = originalLayer;
 
         transform.Translate(sp);
 
@@ -248,7 +227,7 @@ public class CustomPhysics : MonoBehaviour
         transform.Translate(finalTransform);*/
     }
 
-    private float Accelerate (float current, float target)
+    protected float Accelerate (float current, float target)
     {
         float accel = Mathf.Max(10, 3 * Mathf.Abs(target - current));
         if (current == target)
@@ -269,6 +248,72 @@ public class CustomPhysics : MonoBehaviour
                 return target;
             }
         }
+    }
+
+    protected virtual bool CollideH ()
+    {
+        for (i2=0; i2<hits.Length; i2++)
+        {
+            collide = true;
+            if (ray.direction.x == 1)
+                collideRight = true;
+            else
+                collideLeft = true;
+            lockX = false;
+        
+            float dst = Vector2.Distance(ray.origin, hits[i2].point);
+            if (dst > skin)
+            {
+                speed.x = 0;
+                sp.x = dst * ray.direction.x - skin * ray.direction.x;
+            }
+            else
+            {
+                speed.x = 0;
+                sp.x = 0;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    protected virtual bool CollideV ()
+    {
+        for (i2=0; i2<hits.Length; i2++)
+        {
+            collide = true;
+            if (ray.direction.y == 1)
+                collideTop = true;
+            else
+                collideBottom = true;
+            lockY = false;
+        
+            float dst = Vector3.Distance(ray.origin, hits[i2].point);
+            if (dst > skin)
+            {
+                speed.y = 0;
+                sp.y = dst * ray.direction.y - skin * ray.direction.y;
+            }
+            else
+            {
+                speed.y = 0;
+                sp.y = 0; 
+            }
+            return true;
+        }
+        return false;
+    }
+
+    protected virtual bool CollideD ()
+    {
+        for (i2=0; i2<hits.Length; i2++)
+        {
+            collideBottom = true;
+            speed.y = 0;
+            sp.y = 0;
+            return true;
+        }
+        return false;
     }
     
     public void SetSpeedY (float target, float time)
