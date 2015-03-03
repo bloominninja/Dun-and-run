@@ -178,9 +178,9 @@ public class PlayerController : MonoBehaviour
         }
 
         if (active1 != null)
-            active1.Tick();
+            active1.Tick(this);
         if (active2 != null)
-            active2.Tick();
+            active2.Tick(this);
 
 
         physics.Move(s);
