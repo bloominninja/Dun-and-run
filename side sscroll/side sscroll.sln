@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 
 Project("{A97EACB4-9431-76A7-6F4C-57A4827C4787}") = "side sscroll", "Assembly-CSharp.csproj", "{5EAA8D30-4D2E-D479-F916-AA3CBA36D95F}"
 EndProject
+Project("{A97EACB4-9431-76A7-6F4C-57A4827C4787}") = "side sscroll", "Assembly-UnityScript.unityproj", "{957E952E-7236-7A1B-C1B3-5EFB5F0BBB07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,11 +15,15 @@ Global
 		{5EAA8D30-4D2E-D479-F916-AA3CBA36D95F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EAA8D30-4D2E-D479-F916-AA3CBA36D95F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EAA8D30-4D2E-D479-F916-AA3CBA36D95F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957E952E-7236-7A1B-C1B3-5EFB5F0BBB07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957E952E-7236-7A1B-C1B3-5EFB5F0BBB07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957E952E-7236-7A1B-C1B3-5EFB5F0BBB07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957E952E-7236-7A1B-C1B3-5EFB5F0BBB07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-																															GlobalSection(MonoDevelopProperties) = preSolution
+																																												GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Assembly-CSharp.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1

@@ -10,16 +10,12 @@ public class Item : MonoBehaviour
     [HideInInspector]
     protected int
         i;
-    [HideInInspector]
-    protected BoxCollider2D
-        box;
 
     // Use this for initialization
     protected virtual void Start ()
     {
         physics = GetComponent<CustomPhysics>();
         players = (PlayerController[])FindObjectsOfType(typeof(PlayerController));
-        box = GetComponent<BoxCollider2D>();
     }
 	
     // Update is called once per frame
@@ -42,7 +38,6 @@ public class Item : MonoBehaviour
                 }
             }
         }
-
     }
 
     public virtual void OnPickup (PlayerController player)

@@ -3,6 +3,7 @@ using System.Collections;
 
 public class PlayerPhysics : CustomPhysics
 {
+    public bool ledge;
 
     protected override void Start ()
     {

@@ -41,8 +41,8 @@ public class CustomPhysics : MonoBehaviour
     protected virtual void Start ()
     {
         box = GetComponent<BoxCollider2D>();
-        siz = box.size;
-        cen = box.center;
+        siz = box.size * transform.localScale.x;
+        cen = box.center * transform.localScale.x;
     }
 
     protected virtual void Update ()
@@ -94,7 +94,7 @@ public class CustomPhysics : MonoBehaviour
             for (i=0; i<3; i++)
             {
                 d.Set(0, Mathf.Sign(sp.y));
-                o.Set((transform.position.x + cen.x - siz.x / 2) + siz.x / 2 * i, transform.position.y + cen.y + siz.y / 2 * d.y);
+                o.Set((transform.position.x + cen.x + siz.x / 2) - siz.x / 2 * i, transform.position.y + cen.y + siz.y / 2 * d.y);
                 ray = new Ray2D(o, d);
                 Debug.DrawRay(ray.origin, ray.direction);
                 hits = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Abs(sp.y) + skin, LayerMask.GetMask(collLayer1, collLayer2, collLayer3));
@@ -114,7 +114,7 @@ public class CustomPhysics : MonoBehaviour
             for (i=0; i<3; i++)
             {
                 d.Set(Mathf.Sign(sp.x), 0);
-                o.Set(transform.position.x + cen.x + siz.x / 2 * d.x, (transform.position.y + cen.y - siz.y / 2) + siz.y / 2 * i);
+                o.Set(transform.position.x + cen.x + siz.x / 2 * d.x, (transform.position.y + cen.y + siz.y / 2) - siz.y / 2 * i);
                 ray = new Ray2D(o, d);
                 Debug.DrawRay(ray.origin, ray.direction);
                 hits = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Abs(sp.x) + skin, LayerMask.GetMask(collLayer1, collLayer2, collLayer3));
@@ -144,7 +144,7 @@ public class CustomPhysics : MonoBehaviour
         #endregion
         gameObject.layer = originalLayer;
 
-        transform.Translate(sp);
+        transform.Translate(sp, Space.World);
 
 
 

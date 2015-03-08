@@ -55,6 +55,11 @@
      <Compile Include="Assets\Scripts\PlayerPhysics.cs" />
      <Compile Include="Assets\Scripts\Projectile.cs" />
      <Compile Include="Assets\Scripts\ProjectilePhysics.cs" />
+     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony-Basic.shader" />
+     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony Gooch RimOutline Hard.shader" />
+     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony-BasicOutline.shader" />
+     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony-LightedOutline.shader" />
+     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony-Lighted.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.3/UnityEngine.UI.dll</HintPath>
  </Reference>

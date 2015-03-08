@@ -156,6 +156,10 @@ public class PlayerController : MonoBehaviour
                 physics.SetSpeedX(-speed, 0.15f);
                 physics.SetSpeedY(jumpHeight, 0.15f);
             }
+            else if (Right() && physics.speed.y <= -physics.gravity / 4)
+            {
+                physics.SetSpeedY(-physics.gravity / 4, 0);
+            }
         }
         else if (physics.collideLeft)
         {
@@ -164,7 +168,18 @@ public class PlayerController : MonoBehaviour
                 physics.SetSpeedX(speed, 0.15f);
                 physics.SetSpeedY(jumpHeight, 0.15f);
             }
+            else if (Left() && physics.speed.y <= -physics.gravity / 4)
+            {
+                physics.SetSpeedY(-physics.gravity / 4, 0);
+            }
         }
+
+        if (AttackPressed())
+            AttackEffect();
+
+        if (SpecialPressed())
+            SpecialEffect();
+
 
         grab = false;
         if (Grab1Pressed() || Grab2Pressed())
@@ -178,9 +193,21 @@ public class PlayerController : MonoBehaviour
         }
 
         if (active1 != null)
+        {
+            if (Item1Pressed())
+            {
+                active1.Activate();
+            }
             active1.Tick(this);
+        }
         if (active2 != null)
+        {
+            if (Item2Pressed())
+            {
+                active2.Activate();
+            }
             active2.Tick(this);
+        }
 
 
         physics.Move(s);
@@ -283,6 +310,16 @@ public class PlayerController : MonoBehaviour
         }
     }*/
 
+    protected virtual void AttackEffect ()
+    {
+
+    }
+
+    protected virtual void SpecialEffect ()
+    {
+
+    }
+
     public virtual void Bounce (GameObject other, Vector2 sp)
     {
         if (sp.x != 0)
@@ -343,6 +380,12 @@ public class PlayerController : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public virtual bool Hit (Projectile projectile)
+    {
+        projectile.Effect(this);
+        return true;
     }
 
     #region Input Functions
