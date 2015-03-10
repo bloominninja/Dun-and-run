@@ -3,6 +3,7 @@ using System.Collections;
 
 public class ActiveItem : Item
 {
+    public float cooldown = 1;
 
     // Use this for initialization
     protected override void Start ()
@@ -35,7 +36,7 @@ public class ActiveItem : Item
 
     }
 
-    public void Activate ()
+    public void Activate (PlayerController player)
     {
 
     }

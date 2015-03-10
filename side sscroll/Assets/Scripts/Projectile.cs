@@ -1,34 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(CustomPhysics))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class Projectile : MonoBehaviour
 {
-    protected CustomPhysics physics;
     protected PlayerController[] players;
+    protected BoxCollider2D box;
+    public int team;
+    public int direction = 1;
+    public float life = 0;
     [HideInInspector]
     protected int
         i;
-
+    
     // Use this for initialization
-    void Start ()
+    protected virtual void Start ()
     {
-        physics = GetComponent<CustomPhysics>();
         players = (PlayerController[])FindObjectsOfType(typeof(PlayerController));
+        box = GetComponent<BoxCollider2D>();
     }
-	
+    
     // Update is called once per frame
-    void Update ()
+    protected virtual void Update ()
     {
-        physics.Move(Vector2.zero);
+        life += Time.deltaTime;
     }
     
     protected virtual void LateUpdate ()
     {
         for (i=0; i<players.Length; i++)
         {
-            if (collider2D.bounds.Intersects(players[i].collider2D.bounds))
+            if (box.bounds.Intersects(players[i].box.bounds))
             {
+                if (players[i].team != team)
                 if (players[i].Hit(this))
                     break;
             }
@@ -39,4 +43,5 @@ public class Projectile : MonoBehaviour
     {
         Destroy(this.gameObject);
     }
+
 }

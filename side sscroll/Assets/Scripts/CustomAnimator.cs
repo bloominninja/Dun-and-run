@@ -21,12 +21,17 @@ public class CustomAnimator : MonoBehaviour
     {
         if (animations != null)
         {
-            if (physics.speed.x > 0)
+            if (player.direction > 0)
                 transform.eulerAngles = Vector3.zero;
-            else if (physics.speed.x < 0)
+            else if (player.direction < 0)
                 transform.eulerAngles = Vector3.up * 180;
 
-            if (!physics.collideBottom)
+            if (player.attacking)
+            {
+                animations.Play("attack");
+                animations.wrapMode = WrapMode.Once;
+            }
+            else if (!physics.collideBottom)
             {
                 animations.Play("jump");
                 animations.wrapMode = WrapMode.Once;

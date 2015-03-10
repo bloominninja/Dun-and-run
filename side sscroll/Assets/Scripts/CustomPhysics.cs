@@ -18,13 +18,10 @@ public class CustomPhysics : MonoBehaviour
     public bool lockY;
     protected float lockXTime;
     protected float lockYTime;
-    public bool collideRight, collideLeft, collideTop, collideBottom;
+    public bool collideRight, collideLeft, collideTop, collideBottom, collide;
     public string collLayer1 = "Terrain";
     public string collLayer2;
     public string collLayer3;
-    [HideInInspector]
-    protected bool
-        collide;
     [HideInInspector]
     protected Ray2D
         ray;
@@ -96,7 +93,7 @@ public class CustomPhysics : MonoBehaviour
                 d.Set(0, Mathf.Sign(sp.y));
                 o.Set((transform.position.x + cen.x + siz.x / 2) - siz.x / 2 * i, transform.position.y + cen.y + siz.y / 2 * d.y);
                 ray = new Ray2D(o, d);
-                Debug.DrawRay(ray.origin, ray.direction);
+                //Debug.DrawRay(ray.origin, ray.direction);
                 hits = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Abs(sp.y) + skin, LayerMask.GetMask(collLayer1, collLayer2, collLayer3));
                 if (hits.Length != 0)
                 {
@@ -116,7 +113,7 @@ public class CustomPhysics : MonoBehaviour
                 d.Set(Mathf.Sign(sp.x), 0);
                 o.Set(transform.position.x + cen.x + siz.x / 2 * d.x, (transform.position.y + cen.y + siz.y / 2) - siz.y / 2 * i);
                 ray = new Ray2D(o, d);
-                Debug.DrawRay(ray.origin, ray.direction);
+                //Debug.DrawRay(ray.origin, ray.direction);
                 hits = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Abs(sp.x) + skin, LayerMask.GetMask(collLayer1, collLayer2, collLayer3));
                 if (hits.Length != 0)
                 {
@@ -134,7 +131,7 @@ public class CustomPhysics : MonoBehaviour
             o.Set(transform.position.x + cen.x + siz.x / 2 * Mathf.Sign(sp.x), transform.position.y + cen.y + siz.y / 2 * Mathf.Sign(sp.y));
             d.Set(sp.normalized.x, sp.normalized.y);
             ray = new Ray2D(o, d);
-            Debug.DrawRay(ray.origin, ray.direction);
+            //Debug.DrawRay(ray.origin, ray.direction);
             hits = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Sqrt(Mathf.Pow(sp.x, 2) + Mathf.Pow(sp.y, 2)), LayerMask.GetMask(collLayer1, collLayer2, collLayer3));
             if (hits.Length != 0)
             {
@@ -272,9 +269,8 @@ public class CustomPhysics : MonoBehaviour
                 speed.x = 0;
                 sp.x = 0;
             }
-            return true;
         }
-        return false;
+        return true;
     }
 
     protected virtual bool CollideV ()
@@ -299,21 +295,20 @@ public class CustomPhysics : MonoBehaviour
                 speed.y = 0;
                 sp.y = 0; 
             }
-            return true;
         }
-        return false;
+        return true;
     }
 
     protected virtual bool CollideD ()
     {
         for (i2=0; i2<hits.Length; i2++)
         {
+            collide = true;
             collideBottom = true;
             speed.y = 0;
             sp.y = 0;
-            return true;
         }
-        return false;
+        return true;
     }
     
     public void SetSpeedY (float target, float time)
