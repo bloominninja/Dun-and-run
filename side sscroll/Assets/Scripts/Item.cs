@@ -31,7 +31,7 @@ public class Item : MonoBehaviour
         {
             for (i=0; i<players.Length; i++)
             {
-                if (collider2D.bounds.Intersects(players[i].collider2D.bounds))
+                if (GetComponent<Collider2D>().bounds.Intersects(players[i].GetComponent<Collider2D>().bounds))
                 {
                     if (players[i].Pickup(this))
                         break;
@@ -43,13 +43,13 @@ public class Item : MonoBehaviour
     public virtual void OnPickup (PlayerController player)
     {
         held = true;
-        renderer.enabled = false;
+        GetComponent<Renderer>().enabled = false;
     }
 
     public virtual void OnDrop (PlayerController player)
     {
         held = false;
-        renderer.enabled = true;
+        GetComponent<Renderer>().enabled = true;
         transform.position = player.transform.position;
     }
 

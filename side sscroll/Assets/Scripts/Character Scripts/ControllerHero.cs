@@ -58,7 +58,7 @@ public class ControllerHero : PlayerController
             specialCooldownCurrent = specialCooldown;
 
             ProjectileHeroArrow t = (ProjectileHeroArrow)Instantiate(projArrow);
-            t.transform.position = transform.position + (Vector3)box.center;
+            t.transform.position = transform.position + (Vector3)box.offset;
             t.direction = direction;
             t.team = team;
         }

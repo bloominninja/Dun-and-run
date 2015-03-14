@@ -25,7 +25,7 @@ public class ActiveItem : Item
             {
                 if (players[i].grab)
                 {
-                    if (collider2D.bounds.Intersects(players[i].collider2D.bounds))
+                    if (GetComponent<Collider2D>().bounds.Intersects(players[i].GetComponent<Collider2D>().bounds))
                     {
                         if (players[i].Pickup(this))
                             break;

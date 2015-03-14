@@ -39,7 +39,7 @@ public class CustomPhysics : MonoBehaviour
     {
         box = GetComponent<BoxCollider2D>();
         siz = box.size * transform.localScale.x;
-        cen = box.center * transform.localScale.x;
+        cen = box.offset * transform.localScale.x;
     }
 
     protected virtual void Update ()

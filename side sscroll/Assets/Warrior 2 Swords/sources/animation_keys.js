@@ -9,23 +9,23 @@
     
     if (Input.GetKey("1"))
     		{
-    		animation.Play ("run");}
+    		GetComponent.<Animation>().Play ("run");}
     		
     else if(Input.GetKey("2"))
     		{
-  			  animation.Play ("attack");}
+  			  GetComponent.<Animation>().Play ("attack");}
   			  
   	else if(Input.GetKey("3"))
     		{
-  			  animation.Play ("walk");}		  
+  			  GetComponent.<Animation>().Play ("walk");}		  
 
     else if(Input.GetKey("4"))
     		{
-  			  animation.Play ("jump");}
+  			  GetComponent.<Animation>().Play ("jump");}
   			  
   	else 
    			 {
-    		animation.Play ("idle");}
+    		GetComponent.<Animation>().Play ("idle");}
 
    	 }
     
