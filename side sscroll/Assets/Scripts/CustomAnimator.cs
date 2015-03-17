@@ -4,48 +4,30 @@ using System.Collections;
 public class CustomAnimator : MonoBehaviour
 {
 
-    public Animation animations;
+    public Animator animator;
     protected CustomPhysics physics;
     protected PlayerController player;
 
+    public bool attacking = false;
+    public bool special = false;
+    public bool item = false;
+    public bool hurt = false;
+
+    protected Vector3 t;
+
     // Use this for initialization
-    void Start ()
+    public virtual void Start ()
     {
-        animations = GetComponentInChildren<Animation>();
+        animator = GetComponentInChildren<Animator>();
         physics = GetComponent<CustomPhysics>();
         player = GetComponent<PlayerController>();
     }
 	
     // Update is called once per frame
-    void LateUpdate ()
+    public virtual void LateUpdate ()
     {
-        if (animations != null)
-        {
-            if (player.direction > 0)
-                transform.eulerAngles = Vector3.zero;
-            else if (player.direction < 0)
-                transform.eulerAngles = Vector3.up * 180;
-
-            if (player.attacking)
-            {
-                animations.Play("attack");
-                animations.wrapMode = WrapMode.Once;
-            }
-            else if (!physics.collideBottom)
-            {
-                animations.Play("jump");
-                animations.wrapMode = WrapMode.Once;
-            }
-            else if (physics.speed.x != 0)
-            {
-                animations.Play("run");
-                animations.wrapMode = WrapMode.Loop;
-            }
-            else
-            {
-                animations.Play("idle");
-                animations.wrapMode = WrapMode.Loop;
-            }
-        }
+        t = animator.transform.localScale;
+        t.x *= player.direction * Mathf.Sign(animator.transform.localScale.x);
+        animator.transform.localScale = t;
     }
 }

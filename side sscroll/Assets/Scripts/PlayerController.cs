@@ -26,7 +26,6 @@ public class PlayerController : MonoBehaviour
     public float basicCooldownCurrent = 0, specialCooldownCurrent = 0, active1CooldownCurrent = 0, active2CooldownCurrent = 0;
     public bool invincible = false;
     public float invincibleTime = 0;
-    public bool attacking = false;
     [HideInInspector]
     protected LinkedListNode<Item>
         p;
@@ -35,9 +34,8 @@ public class PlayerController : MonoBehaviour
         grab = false;
 
     //protected Values
-    [HideInInspector]
-    protected CustomPhysics
-        physics;
+    protected CustomPhysics physics;
+    protected CustomAnimator animator;
     [HideInInspector]
     public BoxCollider2D
         box;
@@ -70,6 +68,7 @@ public class PlayerController : MonoBehaviour
     protected virtual void Start ()
     {
         physics = GetComponent<CustomPhysics>();
+        animator = GetComponent<CustomAnimator>();
         box = GetComponent<BoxCollider2D>();
         passives = new LinkedList<Item>();
 
@@ -186,7 +185,7 @@ public class PlayerController : MonoBehaviour
         {
             lockTime -= Time.deltaTime;
             if (lockTime <= 0)
-                inputLock = false;
+                UnlockInput();
         }
         else
         {
@@ -368,18 +367,30 @@ public class PlayerController : MonoBehaviour
         currentHealth -= damage;
         //if (currentHealth <= 0)
         //Destroy(this.gameObject);
-        invincible = true;
-        invincibleTime = 1;
+        SetInvincible(1);
         LockInput(0.3f);
         physics.SetSpeedX(speed / 4 * dir, 0.3f);
         physics.SetSpeedY(jumpHeight / 4, 0);
         direction = dir * -1;
+        animator.hurt = true;
     }
 
-    public void LockInput (float time)
+    public virtual void LockInput (float time)
     {
         inputLock = true;
         lockTime = time;
+    }
+
+    public virtual void UnlockInput ()
+    {
+        inputLock = false;
+        animator.hurt = false;
+    }
+
+    public virtual void SetInvincible (float time)
+    {
+        invincible = true;
+        invincibleTime = time;
     }
 
     #region Input Functions

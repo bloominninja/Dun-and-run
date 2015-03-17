@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
+[RequireComponent(typeof(AnimatorHero))]
 public class ControllerHero : PlayerController
 {
-    public float attackTime = 0;
     public ProjectileHeroArrow projArrow;
-    [HideInInspector]
-    public ProjectileHeroBasic
-        projBasic;
+    public ProjectileHeroBasic projBasicLeft, projBasicRight;
 
     // Use this for initialization
     protected override void Start ()
@@ -15,24 +14,16 @@ public class ControllerHero : PlayerController
         base.Start();
         maxMagic = 8;
         currentMagic = 8;
-        basicCooldown = 1.5f;
-        specialCooldown = 2;
-        projBasic = GetComponentInChildren<ProjectileHeroBasic>();
-        projBasic.team = team;
+        basicCooldown = 0.3f;
+        specialCooldown = 1.5f;
+        projBasicLeft.team = team;
+        projBasicRight.team = team;
+        projBasicLeft.direction = -1;
     }
 	
     // Update is called once per frame
     protected override void Update ()
     {
-        if (attacking)
-        {
-            attackTime -= Time.deltaTime;
-            if (attackTime <= 0)
-            {
-                attacking = false;
-                projBasic.on = false;
-            }
-        }
         base.Update();
 
     }
@@ -43,10 +34,12 @@ public class ControllerHero : PlayerController
         {
             basicCooldownCurrent = basicCooldown;
 
-            projBasic.on = true;
-            attacking = true;
-            attackTime = 0.5f;
-            LockInput(0.5f);
+            if (direction > 0)
+                projBasicRight.Activate(0.2f);
+            else
+                projBasicLeft.Activate(0.2f);
+            animator.attacking = true;
+            LockInput(0.2f);
         }
     }
 
@@ -61,6 +54,25 @@ public class ControllerHero : PlayerController
             t.transform.position = transform.position + (Vector3)box.offset;
             t.direction = direction;
             t.team = team;
+
+            animator.special = true;
+            LockInput(0.3f);
         }
+    }
+
+    public override void Damage (int damage, int dir)
+    {
+        base.Damage(damage, dir);
+        animator.attacking = false;
+        animator.special = false;
+        projBasicLeft.Deactivate();
+        projBasicRight.Deactivate();
+    }
+
+    public override void UnlockInput ()
+    {
+        base.UnlockInput();
+        animator.attacking = false;
+        animator.special = false;
     }
 }
