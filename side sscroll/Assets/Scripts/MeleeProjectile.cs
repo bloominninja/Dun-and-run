@@ -8,13 +8,13 @@ public class MeleeProjectile : Projectile
     protected float onTime;
 
     // Use this for initialization
-    protected virtual void Start ()
+    protected override void Start ()
     {
         base.Start();
     }
     
     // Update is called once per frame
-    protected virtual void Update ()
+    protected override void Update ()
     {
         if (on)
         {
@@ -26,7 +26,7 @@ public class MeleeProjectile : Projectile
         }
     }
 
-    protected virtual void LateUpdate ()
+    protected override void LateUpdate ()
     {
         if (on)
             base.LateUpdate();

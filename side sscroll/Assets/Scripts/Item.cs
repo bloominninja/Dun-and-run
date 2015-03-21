@@ -2,20 +2,19 @@
 using System.Collections;
 
 [RequireComponent(typeof(CustomPhysics))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class Item : MonoBehaviour
 {
     protected CustomPhysics physics;
-    protected PlayerController[] players;
-    protected bool held = false;
-    [HideInInspector]
-    protected int
-        i;
+    protected BoxCollider2D box;
+    public bool held = false;
+    protected PlayerController i;
 
     // Use this for initialization
     protected virtual void Start ()
     {
         physics = GetComponent<CustomPhysics>();
-        players = (PlayerController[])FindObjectsOfType(typeof(PlayerController));
+        box = GetComponent<BoxCollider2D>();
     }
 	
     // Update is called once per frame
@@ -29,11 +28,11 @@ public class Item : MonoBehaviour
     {
         if (!held)
         {
-            for (i=0; i<players.Length; i++)
+            foreach (PlayerController i in GameManager.o.players)
             {
-                if (GetComponent<Collider2D>().bounds.Intersects(players[i].GetComponent<Collider2D>().bounds))
+                if (box.bounds.Intersects(i.box.bounds))
                 {
-                    if (players[i].Pickup(this))
+                    if (i.Pickup(this))
                         break;
                 }
             }
@@ -43,7 +42,7 @@ public class Item : MonoBehaviour
     public virtual void OnPickup (PlayerController player)
     {
         held = true;
-        GetComponent<Renderer>().enabled = false;
+        GetComponent<SpriteRenderer>().enabled = false;
     }
 
     public virtual void OnDrop (PlayerController player)

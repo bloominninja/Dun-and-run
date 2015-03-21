@@ -4,19 +4,20 @@ using System.Collections.Generic;
 
 [RequireComponent(typeof(CustomPhysics))]
 [RequireComponent(typeof(CustomAnimator))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController : MonoBehaviour
 {
     //Public Values
     public float speed = 8;
     public Vector2 s;
-    public float jumpHeight = 12;
+    public float jumpHeight = 14;
     public int maxHealth = 6;
     public int currentHealth = 6;
     public int maxMagic = 6;
     public int currentMagic = 6;
     public ActiveItem active1;
     public ActiveItem active2;
-    public LinkedList<Item> passives;
+    public List<Item> passives;
     public int team = 1;
     public int direction = 1;
     public float magicRecharge = 3;
@@ -27,7 +28,7 @@ public class PlayerController : MonoBehaviour
     public bool invincible = false;
     public float invincibleTime = 0;
     [HideInInspector]
-    protected LinkedListNode<Item>
+    protected Item
         p;
     [HideInInspector]
     public bool
@@ -36,7 +37,7 @@ public class PlayerController : MonoBehaviour
     //protected Values
     protected CustomPhysics physics;
     protected CustomAnimator animator;
-    [HideInInspector]
+    //[HideInInspector]
     public BoxCollider2D
         box;
 
@@ -70,7 +71,7 @@ public class PlayerController : MonoBehaviour
         physics = GetComponent<CustomPhysics>();
         animator = GetComponent<CustomAnimator>();
         box = GetComponent<BoxCollider2D>();
-        passives = new LinkedList<Item>();
+        passives = new List<Item>();
 
         if (inputType == "Keyboard")
         {
@@ -257,11 +258,9 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        p = passives.First;
-        while (p!=null)
+        foreach (Item p in passives)
         {
-            p.Value.Tick(this);
-            p = p.Next;
+            p.Tick(this);
         }
 
         if (active1 != null)
@@ -301,7 +300,7 @@ public class PlayerController : MonoBehaviour
     
     public virtual bool Pickup (Item item)
     {
-        passives.AddLast(item);
+        passives.Add(item);
         item.OnPickup(this);
         return true;
     }
