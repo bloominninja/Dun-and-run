@@ -51,7 +51,11 @@
      <Compile Include="Assets\Scripts\Character Scripts\ControllerHero.cs" />
      <Compile Include="Assets\Scripts\CustomAnimator.cs" />
      <Compile Include="Assets\Scripts\CustomPhysics.cs" />
-     <Compile Include="Assets\Scripts\Item Scripts\HeartContainer.cs" />
+     <Compile Include="Assets\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemBluePotion.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemGreenPotion.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemHeartContainer.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemRedPotion.cs" />
      <Compile Include="Assets\Scripts\Item.cs" />
      <Compile Include="Assets\Scripts\MeleeProjectile.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
@@ -61,11 +65,6 @@
      <Compile Include="Assets\Scripts\Projectile.cs" />
      <Compile Include="Assets\Scripts\ProjectilePhysics.cs" />
      <Compile Include="Assets\Scripts\RangedProjectile.cs" />
-     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony-Basic.shader" />
-     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony Gooch RimOutline Hard.shader" />
-     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony-BasicOutline.shader" />
-     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony-LightedOutline.shader" />
-     <None Include="Assets\Warrior 2 Swords\sources\Toon Shading\Toony-Lighted.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>L:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

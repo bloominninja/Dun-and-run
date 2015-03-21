@@ -6,16 +6,18 @@ public class RangedProjectile : Projectile
 {
     
     protected CustomPhysics physics;
+    protected SpriteRenderer sprite;
     
     // Use this for initialization
-    protected virtual void Start ()
+    protected override void Start ()
     {
         base.Start();
         physics = GetComponent<CustomPhysics>();
+        sprite = GetComponent<SpriteRenderer>();
     }
     
     // Update is called once per frame
-    protected virtual void Update ()
+    protected override void Update ()
     {
         base.Update();
         physics.Move(Vector2.zero);

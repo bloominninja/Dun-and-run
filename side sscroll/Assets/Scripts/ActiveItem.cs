@@ -4,6 +4,7 @@ using System.Collections;
 public class ActiveItem : Item
 {
     public float cooldown = 1;
+    public int cost = 1;
 
     // Use this for initialization
     protected override void Start ()
@@ -21,13 +22,13 @@ public class ActiveItem : Item
     {
         if (!held)
         {
-            for (i=0; i<players.Length; i++)
+            foreach (PlayerController i in GameManager.o.players)
             {
-                if (players[i].grab)
+                if (i.grab)
                 {
-                    if (GetComponent<Collider2D>().bounds.Intersects(players[i].GetComponent<Collider2D>().bounds))
+                    if (box.bounds.Intersects(i.box.bounds))
                     {
-                        if (players[i].Pickup(this))
+                        if (i.Pickup(this))
                             break;
                     }
                 }
@@ -36,7 +37,7 @@ public class ActiveItem : Item
 
     }
 
-    public void Activate (PlayerController player)
+    public virtual void Activate (PlayerController player)
     {
 
     }

@@ -3,7 +3,10 @@ using System.Collections;
 
 public class ProjectileHeroArrow : RangedProjectile
 {
-    protected float speed = 8;
+    protected float speed = 15;
+
+    private Vector3 t;
+    private Quaternion q;
 
     // Use this for initialization
     protected override void Start ()
@@ -11,8 +14,11 @@ public class ProjectileHeroArrow : RangedProjectile
         base.Start();
 
         physics.SetSpeedX(speed * direction, 3);
-        physics.SetSpeedY(0, 1);
-        //transform.rotation = new Quaternion(0, 0, 270, 0);
+        physics.SetSpeedY(0, 0.4f);
+
+        t = transform.localScale;
+        t.x *= direction * Mathf.Sign(transform.localScale.x);
+        transform.localScale = t;
     }
 	
     // Update is called once per frame
@@ -20,13 +26,17 @@ public class ProjectileHeroArrow : RangedProjectile
     {
         base.Update();
 
-        if (life >= 2)
+        if (life >= 1.2f)
         {
             Destroy(this.gameObject);
         }
         else if (physics.collide)
         {
             Destroy(this.gameObject);
+        }
+        else
+        {
+            transform.Rotate(Vector3.forward * Mathf.Rad2Deg * (Mathf.Atan(physics.speed.y / physics.speed.x) - transform.rotation.z));
         }
     }
 

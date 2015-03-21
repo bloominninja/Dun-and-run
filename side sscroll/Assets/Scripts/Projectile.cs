@@ -4,19 +4,15 @@ using System.Collections;
 [RequireComponent(typeof(BoxCollider2D))]
 public class Projectile : MonoBehaviour
 {
-    protected PlayerController[] players;
     protected BoxCollider2D box;
     public int team;
     public int direction = 1;
     public float life = 0;
-    [HideInInspector]
-    protected int
-        i;
+    protected PlayerController i;
     
     // Use this for initialization
     protected virtual void Start ()
     {
-        players = (PlayerController[])FindObjectsOfType(typeof(PlayerController));
         box = GetComponent<BoxCollider2D>();
     }
     
@@ -28,12 +24,12 @@ public class Projectile : MonoBehaviour
     
     protected virtual void LateUpdate ()
     {
-        for (i=0; i<players.Length; i++)
+        foreach (PlayerController i in GameManager.o.players)
         {
-            if (box.bounds.Intersects(players[i].box.bounds))
+            if (box.bounds.Intersects(i.box.bounds))
             {
-                if (players[i].team != team)
-                if (players[i].Hit(this))
+                if (i.team != team)
+                if (i.Hit(this))
                     break;
             }
         }
