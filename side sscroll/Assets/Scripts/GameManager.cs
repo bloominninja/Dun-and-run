@@ -1,19 +1,22 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager o;
+    public static GameManager o { get; private set; }
 
     public List<PlayerController> players;
     public List<Item> items;
+    public Stage stage;
 
-    // Use this for initialization
-    void Start ()
+    void Awake ()
     {
         o = this;
-
+        DontDestroyOnLoad(this.gameObject);
+    }
+    void Start ()
+    {
         players = new List<PlayerController>();
         items = new List<Item>();
 

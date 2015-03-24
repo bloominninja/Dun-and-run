@@ -43,7 +43,7 @@ Temporary Items
 .apdisk
 
 
-side sscroll/Library/
+side sscroll/Library/*
 side sscroll/side sscroll-csharp.sln
 side sscroll/Library/ScriptAssemblies/BuiltinAssemblies.stamp
 side sscroll/Assembly-CSharp.csproj
