@@ -28,7 +28,7 @@ public class Projectile : MonoBehaviour
         {
             if (box.bounds.Intersects(i.box.bounds))
             {
-                if (i.team != team)
+                if (i.team != team || team == 0)
                 if (i.Hit(this))
                     break;
             }

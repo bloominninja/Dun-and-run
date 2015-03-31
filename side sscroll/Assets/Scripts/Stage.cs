@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Stage : MonoBehaviour {
+public class Stage : MonoBehaviour
+{
+    public GameObject[] playerSpawns;
+    public GameObject[] chestSpawns;
 
-	// Use this for initialization
-	void Start () {
+    void Start ()
+    {
+        GameManager.o.LoadStage();
+    }
 	
-	}
+    void Update ()
+    {
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    }
 }

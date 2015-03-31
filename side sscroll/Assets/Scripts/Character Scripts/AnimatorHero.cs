@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AnimatorHero : CustomAnimator
 {
-
+    private string currentAnim;
     // Use this for initialization
     public override void Start ()
     {
@@ -16,41 +16,59 @@ public class AnimatorHero : CustomAnimator
         base.LateUpdate();
         if (animator != null)
         {
-            if (hurt)
+            if (player.defeated)
             {
-                if (!physics.collideBottom)
-                    animator.Play("Hurt_1");
-                else
-                    animator.Play("Hurt_2");
+                if (currentAnim != "Defeated")
+                {
+                    if (!physics.collideBottom)
+                        currentAnim = "Hurt_2";
+                    else
+                        currentAnim = "Defeated";
+                }
+                
+            }
+            else if (hurt)
+            {
+                if (currentAnim != "Hurt_2" && currentAnim != "Hurt_1")
+                {
+                    if (!physics.collideBottom)
+                        currentAnim = "Hurt_1";
+                    else
+                        currentAnim = "Hurt_2";
+                }
             }
             else if (attacking)
             {
-                if (!physics.collideBottom)
-                    animator.Play("Attack_2");
-                else
-                    animator.Play("Attack_1");
+                if (currentAnim != "Attack_2" && currentAnim != "Attack_1")
+                {
+                    if (!physics.collideBottom)
+                        currentAnim = "Attack_2";
+                    else
+                        currentAnim = "Attack_1";
+                }
             }
             else if (special)
             {
-                animator.Play("Special");
+                currentAnim = "Special";
             }
             else if (!physics.collideBottom)
             {
                 if (physics.speed.y > 2)
-                    animator.Play("Jump_up");
+                    currentAnim = "Jump_up";
                 else if (physics.speed.y < -2)
-                    animator.Play("Jump_down");
+                    currentAnim = "Jump_down";
                 else
-                    animator.Play("Jump_neutral");
+                    currentAnim = "Jump_neutral";
             }
             else if (physics.speed.x != 0)
             {
-                animator.Play("Running");
+                currentAnim = "Running";
             }
             else
             {
-                animator.Play("Idle");
+                currentAnim = "Idle";
             }
+            animator.Play(currentAnim);
         }
     }
 }

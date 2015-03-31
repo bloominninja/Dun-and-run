@@ -28,7 +28,7 @@ public class ProjectileHeroArrow : RangedProjectile
 
         if (life >= 1.2f)
         {
-            Destroy(this.gameObject);
+            //Destroy(this.gameObject);
         }
         else if (physics.collide)
         {

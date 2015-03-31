@@ -10,16 +10,20 @@ public class PlayerController : MonoBehaviour
     //Public Values
     public float speed = 8;
     public Vector2 s;
-    public float jumpHeight = 14;
+    public float jumpHeight = 16;
     public int maxHealth = 6;
     public int currentHealth = 6;
     public int maxMagic = 6;
     public int currentMagic = 6;
+    public float knockbackMult = 0.7f;
+    public float knockbackDur = 0.3f;
     public ActiveItem active1;
     public ActiveItem active2;
     public List<Item> passives;
     public int team = 1;
     public int direction = 1;
+    public int extraJumps = 0;
+    public int extraJumpsCurrent = 0;
     public float magicRecharge = 3;
     public float magicRechargeCurrent = 0;
     public float basicCooldown = 1;
@@ -27,6 +31,8 @@ public class PlayerController : MonoBehaviour
     public float basicCooldownCurrent = 0, specialCooldownCurrent = 0, active1CooldownCurrent = 0, active2CooldownCurrent = 0;
     public bool invincible = false;
     public float invincibleTime = 0;
+    public float invincibleDur = 1;
+    public bool defeated = false;
     [HideInInspector]
     protected Item
         p;
@@ -35,7 +41,9 @@ public class PlayerController : MonoBehaviour
         grab = false;
 
     //protected Values
-    protected CustomPhysics physics;
+    [HideInInspector]
+    public CustomPhysics
+        physics;
     protected CustomAnimator animator;
     //[HideInInspector]
     public BoxCollider2D
@@ -147,127 +155,140 @@ public class PlayerController : MonoBehaviour
     
     protected virtual void Update ()
     {
-        if (invincible)
+        if (!defeated)
         {
-            invincibleTime -= Time.deltaTime;
-            if (invincibleTime <= 0)
-                invincible = false;
-        }
-        if (currentMagic < maxMagic)
-        {
-            magicRechargeCurrent -= Time.deltaTime;
-            if (magicRechargeCurrent <= 0)
+            if (invincible)
             {
-                currentMagic += 1;
-                if (currentMagic == maxMagic)
+                invincibleTime -= Time.deltaTime;
+                if (invincibleTime <= 0)
+                    invincible = false;
+            }
+            if (currentMagic < maxMagic)
+            {
+                magicRechargeCurrent -= Time.deltaTime;
+                if (magicRechargeCurrent <= 0)
                 {
-                    magicRechargeCurrent = magicRecharge;
+                    currentMagic += 1;
+                    if (currentMagic == maxMagic)
+                    {
+                        magicRechargeCurrent = magicRecharge;
+                    }
+                    else
+                    {
+                        magicRechargeCurrent += magicRecharge;
+                    }
                 }
-                else
+            }
+
+            if (basicCooldownCurrent > 0)
+                basicCooldownCurrent -= Time.deltaTime;
+            if (specialCooldownCurrent > 0)
+                specialCooldownCurrent -= Time.deltaTime;
+            if (active1CooldownCurrent > 0)
+                active1CooldownCurrent -= Time.deltaTime;
+            if (active2CooldownCurrent > 0)
+                active2CooldownCurrent -= Time.deltaTime;
+
+            grab = false;
+            s = Vector2.zero;
+
+            if (inputLock)
+            {
+                lockTime -= Time.deltaTime;
+                if (lockTime <= 0)
+                    UnlockInput();
+            }
+            else
+            {
+                if (Left())
                 {
-                    magicRechargeCurrent += magicRecharge;
+                    s.x = -speed;
+                    direction = -1;
                 }
-            }
-        }
+                else if (Right())
+                {
+                    s.x = speed;
+                    direction = 1;
+                }
 
-        if (basicCooldownCurrent > 0)
-            basicCooldownCurrent -= Time.deltaTime;
-        if (specialCooldownCurrent > 0)
-            specialCooldownCurrent -= Time.deltaTime;
-        if (active1CooldownCurrent > 0)
-            active1CooldownCurrent -= Time.deltaTime;
-        if (active2CooldownCurrent > 0)
-            active2CooldownCurrent -= Time.deltaTime;
+                if (Jump())
+                {
+                    if (physics.speed.y >= 0)
+                        s.y = jumpHeight / 1.5f;
+                    else
+                        s.y = jumpHeight / 5;
+                }
 
-        grab = false;
-        s = Vector2.zero;
-
-        if (inputLock)
-        {
-            lockTime -= Time.deltaTime;
-            if (lockTime <= 0)
-                UnlockInput();
-        }
-        else
-        {
-            if (Left())
-            {
-                s.x = -speed;
-                direction = -1;
-            }
-            else if (Right())
-            {
-                s.x = speed;
-                direction = 1;
-            }
-
-            if (Jump())
-            {
-                s.y = jumpHeight / 2;
-            }
-
-            if (physics.collideBottom)
-            {
-                if (JumpPressed())
+                if (physics.collideBottom)
+                {
+                    extraJumpsCurrent = extraJumps;
+                    if (JumpPressed())
+                    {
+                        physics.SetSpeedY(jumpHeight, 0.15f);
+                    }
+                }
+                else if (physics.collideRight)
+                {
+                    if (JumpPressed())
+                    {
+                        physics.SetSpeedX(-speed, 0.15f);
+                        physics.SetSpeedY(jumpHeight, 0.15f);
+                    }
+                    else if (Right() && physics.speed.y <= -physics.gravity / 4)
+                    {
+                        physics.SetSpeedY(-physics.gravity / 4, 0);
+                    }
+                }
+                else if (physics.collideLeft)
+                {
+                    if (JumpPressed())
+                    {
+                        physics.SetSpeedX(speed, 0.15f);
+                        physics.SetSpeedY(jumpHeight, 0.15f);
+                    }
+                    else if (Left() && physics.speed.y <= -physics.gravity / 4)
+                    {
+                        physics.SetSpeedY(-physics.gravity / 4, 0);
+                    }
+                }
+                else if (extraJumpsCurrent > 0 && JumpPressed())
+                {
+                    extraJumpsCurrent --;
                     physics.SetSpeedY(jumpHeight, 0.15f);
-            }
-            else if (physics.collideRight)
-            {
-                if (JumpPressed())
-                {
-                    physics.SetSpeedX(-speed, 0.15f);
-                    physics.SetSpeedY(jumpHeight, 0.15f);
                 }
-                else if (Right() && physics.speed.y <= -physics.gravity / 4)
+
+                if (AttackPressed())
+                    AttackEffect();
+
+                if (SpecialPressed())
+                    SpecialEffect();
+
+                if (Grab1Pressed() || Grab2Pressed())
+                    grab = true;
+
+                if (active1 != null && Item1Pressed() && active1CooldownCurrent <= 0)
                 {
-                    physics.SetSpeedY(-physics.gravity / 4, 0);
+                    active1.Activate(this);
+                    active1CooldownCurrent = active1.cooldown;
                 }
-            }
-            else if (physics.collideLeft)
-            {
-                if (JumpPressed())
-                {
-                    physics.SetSpeedX(speed, 0.15f);
-                    physics.SetSpeedY(jumpHeight, 0.15f);
-                }
-                else if (Left() && physics.speed.y <= -physics.gravity / 4)
-                {
-                    physics.SetSpeedY(-physics.gravity / 4, 0);
-                }
-            }
-
-            if (AttackPressed())
-                AttackEffect();
-
-            if (SpecialPressed())
-                SpecialEffect();
-
-            if (Grab1Pressed() || Grab2Pressed())
-                grab = true;
-
-            if (active1 != null && Item1Pressed() && active1CooldownCurrent <= 0)
-            {
-                active1.Activate(this);
-                active1CooldownCurrent = active1.cooldown;
-            }
             
-            if (active2 != null && Item2Pressed() && active2CooldownCurrent <= 0)
-            {
-                active2.Activate(this);
-                active2CooldownCurrent = active2.cooldown;
+                if (active2 != null && Item2Pressed() && active2CooldownCurrent <= 0)
+                {
+                    active2.Activate(this);
+                    active2CooldownCurrent = active2.cooldown;
+                }
             }
+
+            foreach (Item p in passives)
+            {
+                p.Tick(this);
+            }
+
+            if (active1 != null)
+                active1.Tick(this);
+            if (active2 != null)
+                active2.Tick(this);
         }
-
-        foreach (Item p in passives)
-        {
-            p.Tick(this);
-        }
-
-        if (active1 != null)
-            active1.Tick(this);
-        if (active2 != null)
-            active2.Tick(this);
-
         physics.Move(s);
 
         prevLeft = Left();
@@ -276,6 +297,13 @@ public class PlayerController : MonoBehaviour
         prevDown = Down();
         if (inputType != "Keyboard")
             prevSpecial = Special();
+
+        if (currentHealth <= 0)
+        {
+            gameObject.layer = 0;
+            defeated = true;
+            physics.collLayer2 = null;
+        }
     }
 
     protected virtual void AttackEffect ()
@@ -366,10 +394,10 @@ public class PlayerController : MonoBehaviour
         currentHealth -= damage;
         //if (currentHealth <= 0)
         //Destroy(this.gameObject);
-        SetInvincible(1);
-        LockInput(0.3f);
-        physics.SetSpeedX(speed / 4 * dir, 0.3f);
-        physics.SetSpeedY(jumpHeight / 4, 0);
+        SetInvincible(invincibleDur);
+        LockInput(knockbackDur);
+        physics.SetSpeedX(speed * knockbackMult * dir, 0.3f);
+        physics.SetSpeedY(jumpHeight * knockbackMult, 0);
         direction = dir * -1;
         animator.hurt = true;
     }

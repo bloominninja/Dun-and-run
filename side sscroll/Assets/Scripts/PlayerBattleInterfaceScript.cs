@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class PlayerBattleInterfaceScript : MonoBehaviour
 {
-    public ControllerHero connectedPlayer = null;
+    public PlayerController connectedPlayer = null;
 	
     public Sprite[] healthSpriteArray;
     public Sprite[] manaSpriteArray;
@@ -224,7 +224,92 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
                     else
                         e.sprite = manaSpriteArray[2];
                 }
+                else if (e.name == "Active 1")
+                {
+                    if (connectedPlayer.active1 != null)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        e.sprite = connectedPlayer.active1.GetComponent<SpriteRenderer>().sprite;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }
+                else if (e.name == "Active 2")
+                {
+                    if (connectedPlayer.active2 != null)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        e.sprite = connectedPlayer.active2.GetComponent<SpriteRenderer>().sprite;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }
+                else if (e.name == "Passive 1")
+                {
+                    if (connectedPlayer.passives.Count >= 1)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        e.sprite = connectedPlayer.passives[0].GetComponent<SpriteRenderer>().sprite;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }
+                else if (e.name == "Passive 2")
+                {
+                    if (connectedPlayer.passives.Count >= 2)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        e.sprite = connectedPlayer.passives[1].GetComponent<SpriteRenderer>().sprite;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }
+                else if (e.name == "Passive 3")
+                {
+                    if (connectedPlayer.passives.Count >= 3)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        e.sprite = connectedPlayer.passives[2].GetComponent<SpriteRenderer>().sprite;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }
+                else if (e.name == "Passive 4")
+                {
+                    if (connectedPlayer.passives.Count >= 4)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        e.sprite = connectedPlayer.passives[3].GetComponent<SpriteRenderer>().sprite;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }
+                else if (e.name == "Passive 5")
+                {
+                    if (connectedPlayer.passives.Count >= 5)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        e.sprite = connectedPlayer.passives[4].GetComponent<SpriteRenderer>().sprite;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }
             }
+
         }
         else
         {

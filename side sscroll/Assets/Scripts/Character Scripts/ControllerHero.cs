@@ -15,7 +15,7 @@ public class ControllerHero : PlayerController
         maxMagic = 8;
         currentMagic = 8;
         basicCooldown = 0.3f;
-        specialCooldown = 1.5f;
+        specialCooldown = 1.8f;
         projBasicLeft.team = team;
         projBasicRight.team = team;
         projBasicLeft.direction = -1;
@@ -38,6 +38,7 @@ public class ControllerHero : PlayerController
                 projBasicRight.Activate(0.2f);
             else
                 projBasicLeft.Activate(0.2f);
+            physics.speed.x += 6 * direction;
             animator.attacking = true;
             LockInput(0.2f);
         }
