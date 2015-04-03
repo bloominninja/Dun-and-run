@@ -3,14 +3,18 @@ using System.Collections;
 
 public class PlayerPhysics : CustomPhysics
 {
-    public bool ledge;
+    public float ledge;
 
     protected override void Start ()
     {
         base.Start();
         collLayer2 = "Characters";
     }
-
+    public override void Move (Vector2 target)
+    {
+        ledge = 0;
+        base.Move(target);
+    }
     protected override bool CollideH ()
     {
         for (i2=0; i2<hits.Length; i2++)
@@ -35,13 +39,15 @@ public class PlayerPhysics : CustomPhysics
                     speed.x = 0;
                     sp.x = 0;
                 }
+                if (i > 0)
+                    ledge = hits[i2].collider.transform.position.y + hits[i2].collider.transform.localScale.y / 2;
                 return true;
             }
             else if (hits[i2].collider.gameObject.layer == LayerMask.NameToLayer("Characters"))
             {
                 float temp = Mathf.Min(6, Mathf.Max(3, Mathf.Abs(speed.x - hits[i2].collider.gameObject.GetComponent<PlayerPhysics>().speed.x)));
                 GetComponent<PlayerController>().Bounce(hits[i2].collider.gameObject, temp * ray.direction * -1);
-                hits[i2].collider.gameObject.GetComponent<PlayerController>().Bounce(gameObject, temp * ray.direction);
+                hits[i2].collider.GetComponent<PlayerController>().Bounce(gameObject, temp * ray.direction);
 
                 collide = true;
             
@@ -88,9 +94,9 @@ public class PlayerPhysics : CustomPhysics
             }
             else if (hits[i2].collider.gameObject.layer == LayerMask.NameToLayer("Characters"))
             {
-                float temp = Mathf.Min(6, Mathf.Max(3, Mathf.Abs(speed.y - hits[i2].collider.gameObject.GetComponent<PlayerPhysics>().speed.y)));
+                float temp = Mathf.Min(10, Mathf.Max(5, Mathf.Abs(speed.y - hits[i2].collider.GetComponent<PlayerPhysics>().speed.y)));
                 GetComponent<PlayerController>().Bounce(hits[i2].collider.gameObject, temp * ray.direction * -1);
-                hits[i2].collider.gameObject.GetComponent<PlayerController>().Bounce(gameObject, temp * ray.direction);
+                hits[i2].collider.GetComponent<PlayerController>().Bounce(gameObject, temp * ray.direction);
                 
                 collide = true;
                 

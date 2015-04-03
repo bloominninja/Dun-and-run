@@ -13,6 +13,8 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
 	
     CanvasGroup ourCanvas = null;
 
+    Vector3 v;
+
     // Use this for initialization
     void Start ()
     {
@@ -223,6 +225,56 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
                         e.sprite = manaSpriteArray[1];
                     else
                         e.sprite = manaSpriteArray[2];
+                }
+                else if (e.name == "Basic Cooldown")
+                {
+                    v = e.rectTransform.localScale;
+                    if (connectedPlayer.basicCooldownCurrent <= 0)
+                        v.y = 0;
+                    else
+                        v.y = 1.2f*connectedPlayer.basicCooldownCurrent/connectedPlayer.basicCooldown;
+                    e.rectTransform.localScale = v;
+                    v = e.rectTransform.localPosition;
+                    v.y=-60+60*connectedPlayer.basicCooldownCurrent/connectedPlayer.basicCooldown;
+                    e.rectTransform.localPosition = v;
+                }
+                else if (e.name == "Special Cooldown")
+                {
+                    v = e.rectTransform.localScale;
+                    if (connectedPlayer.specialCooldownCurrent <= 0)
+                        v.y = 0;
+                    else
+                        v.y = 1.2f*connectedPlayer.specialCooldownCurrent/connectedPlayer.specialCooldown;
+                    e.rectTransform.localScale = v;
+                    v = e.rectTransform.localPosition;
+                    v.y=-60+60*connectedPlayer.specialCooldownCurrent/connectedPlayer.specialCooldown;
+                    e.rectTransform.localPosition = v;
+                }
+                else if (e.name == "Active 1 Cooldown")
+                {
+                    v = e.rectTransform.localScale;
+                    if (connectedPlayer.active1CooldownCurrent <= 0)
+                        v.y = 0;
+                    else
+                        v.y = 1.2f*connectedPlayer.active1CooldownCurrent/connectedPlayer.active1.cooldown;
+                    e.rectTransform.localScale = v;
+                    if(connectedPlayer.active1 == null) continue;
+                    v = e.rectTransform.localPosition;
+                    v.y=-60+60*connectedPlayer.active1CooldownCurrent/connectedPlayer.active1.cooldown;
+                    e.rectTransform.localPosition = v;
+                }
+                else if (e.name == "Active 2 Cooldown")
+                {
+                    v = e.rectTransform.localScale;
+                    if (connectedPlayer.active2CooldownCurrent <= 0)
+                        v.y = 0;
+                    else
+                        v.y = 1.2f*connectedPlayer.active2CooldownCurrent/connectedPlayer.active2.cooldown;
+                    e.rectTransform.localScale = v;
+                    if(connectedPlayer.active2 == null) continue;
+                    v = e.rectTransform.localPosition;
+                    v.y=-60+60*connectedPlayer.active2CooldownCurrent/connectedPlayer.active2.cooldown;
+                    e.rectTransform.localPosition = v;
                 }
                 else if (e.name == "Active 1")
                 {

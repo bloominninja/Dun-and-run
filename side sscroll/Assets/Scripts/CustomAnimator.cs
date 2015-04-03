@@ -29,5 +29,9 @@ public class CustomAnimator : MonoBehaviour
         t = animator.transform.localScale;
         t.x *= player.direction * Mathf.Sign(animator.transform.localScale.x);
         animator.transform.localScale = t;
+        if (GameManager.o.pause)
+            animator.speed = 0;
+        else
+            animator.speed = 1;
     }
 }

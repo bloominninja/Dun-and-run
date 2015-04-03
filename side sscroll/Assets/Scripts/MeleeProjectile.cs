@@ -16,6 +16,8 @@ public class MeleeProjectile : Projectile
     // Update is called once per frame
     protected override void Update ()
     {
+        if (GameManager.o.pause)
+            return;
         if (on)
         {
             onTime -= Time.deltaTime;

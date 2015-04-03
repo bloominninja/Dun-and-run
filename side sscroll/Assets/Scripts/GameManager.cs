@@ -11,7 +11,9 @@ public class GameManager : MonoBehaviour
     public List<Item> items;
     public Stage stage;
     public int numPlayers = 0;
-
+    public bool pause = false;
+    private float endTimer = 0f;
+    public bool end = false;
 
     void Awake ()
     {
@@ -43,7 +45,16 @@ public class GameManager : MonoBehaviour
 	
     void Update ()
     {
-        if (stage != null)
+        if (end)
+        {
+            endTimer -= Time.deltaTime;
+            if (endTimer <= 0)
+            {
+                end = false;
+                ChangeScene(0);
+            }
+        }
+        else if (stage != null)
         {
             int i = 0;
             foreach (PlayerController p in players)
@@ -53,8 +64,8 @@ public class GameManager : MonoBehaviour
             }
             if (i <= 1)
             {
-                Debug.Log("yay win");
-                ChangeScene(0);
+                end = true;
+                endTimer = 2;
             }
         }
     }
@@ -123,7 +134,7 @@ public class GameManager : MonoBehaviour
         }
 
         Item[] itemarr = Resources.LoadAll<Item>("Prefabs/Items");
-        for (int i = 0; i <stage.chestSpawns.Length; i++)
+        for (int i = 0; i < stage.chestSpawns.Length; i++)
         {
             Item itemtemp = Instantiate(itemarr[(int)Mathf.Floor(Random.Range(0, itemarr.Length))]).GetComponent<Item>();
             items.Add(itemtemp);

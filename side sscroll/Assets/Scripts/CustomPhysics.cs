@@ -47,6 +47,8 @@ public class CustomPhysics : MonoBehaviour
 
     protected virtual void Update ()
     {
+        if (GameManager.o.pause)
+            return;
         if (lockX)
         {
             lockXTime -= Time.deltaTime;
@@ -61,8 +63,14 @@ public class CustomPhysics : MonoBehaviour
         }
     }
 
-    public void Move (Vector2 target)
+    public virtual void Move (Vector2 target)
     {
+        collide = false;
+        collideRight = false;
+        collideLeft = false;
+        collideTop = false;
+        collideBottom = false;
+
         if (!lockX)
         {
             if (collideBottom && ((target.x == 0 && Mathf.Abs(speed.x) > 1) || (target.x != 0 && Mathf.Sign(speed.x) != Mathf.Sign(target.x))))
@@ -78,12 +86,6 @@ public class CustomPhysics : MonoBehaviour
                 speed.y = Accelerate(speed.y, target.y);
         }
         sp = speed * Time.deltaTime;
-        
-        collide = false;
-        collideRight = false;
-        collideLeft = false;
-        collideTop = false;
-        collideBottom = false;
 
         originalLayer = gameObject.layer;
         gameObject.layer = 2;

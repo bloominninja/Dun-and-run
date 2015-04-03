@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(CustomPhysics))]
+[RequireComponent(typeof(PlayerPhysics))]
 [RequireComponent(typeof(CustomAnimator))]
 [RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController : MonoBehaviour
@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
     //protected Values
     [HideInInspector]
-    public CustomPhysics
+    public PlayerPhysics
         physics;
     protected CustomAnimator animator;
     //[HideInInspector]
@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour
 
     protected virtual void Start ()
     {
-        physics = GetComponent<CustomPhysics>();
+        physics = GetComponent<PlayerPhysics>();
         animator = GetComponent<CustomAnimator>();
         box = GetComponent<BoxCollider2D>();
         passives = new List<Item>();
@@ -155,6 +155,12 @@ public class PlayerController : MonoBehaviour
     
     protected virtual void Update ()
     {
+        if (PausePressed())
+        {
+            GameManager.o.pause = !GameManager.o.pause;
+        }
+        if (GameManager.o.pause)
+            return;
         if (!defeated)
         {
             if (invincible)
@@ -229,7 +235,17 @@ public class PlayerController : MonoBehaviour
                 }
                 else if (physics.collideRight)
                 {
-                    if (JumpPressed())
+                    if (Right() && physics.ledge > 0 && physics.speed.y < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
+                        if (JumpPressed())
+                        {
+                            physics.SetSpeedY(jumpHeight, 0.15f);
+                        }
+                        else
+                            physics.SetSpeedY(0, 0);
+                    }
+                    else if (JumpPressed())
                     {
                         physics.SetSpeedX(-speed, 0.15f);
                         physics.SetSpeedY(jumpHeight, 0.15f);
@@ -323,7 +339,12 @@ public class PlayerController : MonoBehaviour
             physics.SetSpeedX(sp.x, 0.2f);
         }
         else if (sp.y != 0)
-            physics.SetSpeedY(sp.y, 0.2f);
+        {
+            if (physics.collideBottom && sp.y < 0)
+                physics.SetSpeedX(sp.y * -1 * Mathf.Sign(transform.position.x - other.transform.position.x), 0.2f);
+            else
+                physics.SetSpeedY(sp.y, 0.2f);
+        }
     }
     
     public virtual bool Pickup (Item item)
@@ -421,7 +442,7 @@ public class PlayerController : MonoBehaviour
     }
 
     #region Input Functions
-    protected bool Left ()
+    protected virtual bool Left ()
     {
         if (Input.GetAxis(horizontal) < 0)
             return true;
@@ -429,7 +450,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool LeftPressed ()
+    protected virtual bool LeftPressed ()
     {
         if (prevLeft == false && Left())
             return true;
@@ -437,7 +458,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool LeftReleased ()
+    protected virtual bool LeftReleased ()
     {
         if (prevLeft == true && !Left())
             return true;
@@ -445,7 +466,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    protected bool Right ()
+    protected virtual bool Right ()
     {
         if (Input.GetAxis(horizontal) > 0)
             return true;
@@ -453,7 +474,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool RightPressed ()
+    protected virtual bool RightPressed ()
     {
         if (prevRight == false && Right())
             return true;
@@ -461,7 +482,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool RightReleased ()
+    protected virtual bool RightReleased ()
     {
         if (prevRight == true && !Right())
             return true;
@@ -469,7 +490,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    protected bool Up ()
+    protected virtual bool Up ()
     {
         if (Input.GetAxis(vertical) > 0)
             return true;
@@ -477,7 +498,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool UpPressed ()
+    protected virtual bool UpPressed ()
     {
         if (prevUp == false && Up())
             return true;
@@ -485,7 +506,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool UpReleased ()
+    protected virtual bool UpReleased ()
     {
         if (prevUp == true && !Up())
             return true;
@@ -493,7 +514,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    protected bool Down ()
+    protected virtual bool Down ()
     {
         if (Input.GetAxis(vertical) < 0)
             return true;
@@ -501,7 +522,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool DownPressed ()
+    protected virtual bool DownPressed ()
     {
         if (prevDown == false && Down())
             return true;
@@ -509,7 +530,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool DownReleased ()
+    protected virtual bool DownReleased ()
     {
         if (prevDown == true && !Down())
             return true;
@@ -517,37 +538,37 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    protected bool Jump ()
+    protected virtual bool Jump ()
     {
         return Input.GetButton(jump);
     }
     
-    protected bool JumpPressed ()
+    protected virtual bool JumpPressed ()
     {
         return Input.GetButtonDown(jump);
     }
     
-    protected bool JumpReleased ()
+    protected virtual bool JumpReleased ()
     {
         return Input.GetButtonUp(jump);
     }
 
-    protected bool Attack ()
+    protected virtual bool Attack ()
     {
         return Input.GetButton(attack);
     }
     
-    protected bool AttackPressed ()
+    protected virtual bool AttackPressed ()
     {
         return Input.GetButtonDown(attack);
     }
     
-    protected bool AttackReleased ()
+    protected virtual bool AttackReleased ()
     {
         return Input.GetButtonUp(attack);
     }
 
-    protected bool Special ()
+    protected virtual bool Special ()
     {
         if (inputType == "Keyboard")
             return Input.GetButton(special);
@@ -558,7 +579,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    protected bool SpecialPressed ()
+    protected virtual bool SpecialPressed ()
     {
         if (inputType == "Keyboard")
             return Input.GetButtonDown(special);
@@ -568,7 +589,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    protected bool SpecialReleased ()
+    protected virtual bool SpecialReleased ()
     {
         if (inputType == "Keyboard")
             return Input.GetButtonUp(special);
@@ -578,92 +599,92 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
-    protected bool Item1 ()
+    protected virtual bool Item1 ()
     {
         return Input.GetButton(item1);
     }
     
-    protected bool Item1Pressed ()
+    protected virtual bool Item1Pressed ()
     {
         return Input.GetButtonDown(item1);
     }
     
-    protected bool Item1Released ()
+    protected virtual bool Item1Released ()
     {
         return Input.GetButtonUp(item1);
     }
 
-    protected bool Item2 ()
+    protected virtual bool Item2 ()
     {
         return Input.GetButton(item2);
     }
     
-    protected bool Item2Pressed ()
+    protected virtual bool Item2Pressed ()
     {
         return Input.GetButtonDown(item2);
     }
     
-    protected bool Item2Released ()
+    protected virtual bool Item2Released ()
     {
         return Input.GetButtonUp(item2);
     }
 
-    protected bool Grab1 ()
+    protected virtual bool Grab1 ()
     {
         return Input.GetButton(grab1);
     }
     
-    protected bool Grab1Pressed ()
+    protected virtual bool Grab1Pressed ()
     {
         return Input.GetButtonDown(grab1);
     }
     
-    protected bool Grab1Released ()
+    protected virtual bool Grab1Released ()
     {
         return Input.GetButtonUp(grab1);
     }
 
-    protected bool Grab2 ()
+    protected virtual bool Grab2 ()
     {
         return Input.GetButton(grab2);
     }
     
-    protected bool Grab2Pressed ()
+    protected virtual bool Grab2Pressed ()
     {
         return Input.GetButtonDown(grab2);
     }
     
-    protected bool Grab2Released ()
+    protected virtual bool Grab2Released ()
     {
         return Input.GetButtonUp(grab2);
     }
 
-    protected bool Pause ()
+    protected virtual bool Pause ()
     {
         return Input.GetButton(pause);
     }
     
-    protected bool PausePressed ()
+    protected virtual bool PausePressed ()
     {
         return Input.GetButtonDown(pause);
     }
     
-    protected bool PauseReleased ()
+    protected virtual bool PauseReleased ()
     {
         return Input.GetButtonUp(pause);
     }
 
-    protected bool Select ()
+    protected virtual bool Select ()
     {
         return Input.GetButton(select);
     }
     
-    protected bool SelectPressed ()
+    protected virtual bool SelectPressed ()
     {
         return Input.GetButtonDown(select);
     }
     
-    protected bool SelectReleased ()
+    protected virtual bool SelectReleased ()
     {
         return Input.GetButtonUp(select);
     }

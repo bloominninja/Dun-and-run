@@ -25,12 +25,10 @@ public class ProjectileHeroArrow : RangedProjectile
     protected override void Update ()
     {
         base.Update();
-
-        if (life >= 1.2f)
-        {
-            //Destroy(this.gameObject);
-        }
-        else if (physics.collide)
+        
+        if (GameManager.o.pause)
+            return;
+        if (physics.collide)
         {
             Destroy(this.gameObject);
         }

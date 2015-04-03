@@ -20,6 +20,8 @@ public class Item : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update ()
     {
+        if (GameManager.o.pause)
+            return;
         if (!held)
             physics.Move(Vector2.zero);
     }

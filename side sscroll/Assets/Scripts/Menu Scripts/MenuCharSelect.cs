@@ -136,23 +136,23 @@ public class MenuCharSelect : MonoBehaviour
 
         }
         
-        if (Input.GetButtonDown("KB Start") && GameManager.o.FindPlayer("Keyboard") >= 0 && GameManager.o.numPlayers >= 2)
+        if (Input.GetButtonDown("KB Pause") && GameManager.o.FindPlayer("Keyboard") >= 0 && GameManager.o.numPlayers >= 2)
         {
             GameManager.o.ChangeScene(1);
         }
-        else if (Input.GetButtonDown("Joy1 Start") && GameManager.o.FindPlayer("Joy1") >= 0 && GameManager.o.numPlayers >= 2)
+        else if (Input.GetButtonDown("Joy1 Pause") && GameManager.o.FindPlayer("Joy1") >= 0 && GameManager.o.numPlayers >= 2)
         {
             GameManager.o.ChangeScene(1);
         }
-        else if (Input.GetButtonDown("Joy2 Start") && GameManager.o.FindPlayer("Joy2") >= 0 && GameManager.o.numPlayers >= 2)
+        else if (Input.GetButtonDown("Joy2 Pause") && GameManager.o.FindPlayer("Joy2") >= 0 && GameManager.o.numPlayers >= 2)
         {
             GameManager.o.ChangeScene(1);
         }
-        else if (Input.GetButtonDown("Joy3 Start") && GameManager.o.FindPlayer("Joy3") >= 0 && GameManager.o.numPlayers >= 2)
+        else if (Input.GetButtonDown("Joy3 Pause") && GameManager.o.FindPlayer("Joy3") >= 0 && GameManager.o.numPlayers >= 2)
         {
             GameManager.o.ChangeScene(1);
         }
-        else if (Input.GetButtonDown("Joy4 Start") && GameManager.o.FindPlayer("Joy4") >= 0 && GameManager.o.numPlayers >= 2)
+        else if (Input.GetButtonDown("Joy4 Pause") && GameManager.o.FindPlayer("Joy4") >= 0 && GameManager.o.numPlayers >= 2)
         {
             GameManager.o.ChangeScene(1);
         }

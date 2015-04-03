@@ -19,6 +19,8 @@ public class Projectile : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update ()
     {
+        if (GameManager.o.pause)
+            return;
         life += Time.deltaTime;
     }
     

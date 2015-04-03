@@ -20,6 +20,8 @@ public class RangedProjectile : Projectile
     protected override void Update ()
     {
         base.Update();
+        if (GameManager.o.pause)
+            return;
         physics.Move(Vector2.zero);
     }
 }
