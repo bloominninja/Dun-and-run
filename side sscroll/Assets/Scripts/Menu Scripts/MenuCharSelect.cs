@@ -7,6 +7,7 @@ public class MenuCharSelect : MonoBehaviour
     public GameObject[] players;
     public MenuCharSelectWindow[] windows;
 
+	protected bool fillWithBots = true;//default to true for now to test
 
     private int i;
 
@@ -136,25 +137,36 @@ public class MenuCharSelect : MonoBehaviour
 
         }
         
-        if (Input.GetButtonDown("KB Pause") && GameManager.o.FindPlayer("Keyboard") >= 0 && GameManager.o.numPlayers >= 2)
+        if (Input.GetButtonDown("KB Pause") && GameManager.o.FindPlayer("Keyboard") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
+			GameManager.o.fillAI = fillWithBots;
         }
-        else if (Input.GetButtonDown("Joy1 Pause") && GameManager.o.FindPlayer("Joy1") >= 0 && GameManager.o.numPlayers >= 2)
+        else if (Input.GetButtonDown("Joy1 Pause") && GameManager.o.FindPlayer("Joy1") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
+			GameManager.o.fillAI = fillWithBots;
         }
-        else if (Input.GetButtonDown("Joy2 Pause") && GameManager.o.FindPlayer("Joy2") >= 0 && GameManager.o.numPlayers >= 2)
+        else if (Input.GetButtonDown("Joy2 Pause") && GameManager.o.FindPlayer("Joy2") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
+			GameManager.o.fillAI = fillWithBots;
         }
-        else if (Input.GetButtonDown("Joy3 Pause") && GameManager.o.FindPlayer("Joy3") >= 0 && GameManager.o.numPlayers >= 2)
+        else if (Input.GetButtonDown("Joy3 Pause") && GameManager.o.FindPlayer("Joy3") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
+			GameManager.o.fillAI = fillWithBots;
         }
-        else if (Input.GetButtonDown("Joy4 Pause") && GameManager.o.FindPlayer("Joy4") >= 0 && GameManager.o.numPlayers >= 2)
+        else if (Input.GetButtonDown("Joy4 Pause") && GameManager.o.FindPlayer("Joy4") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
+			GameManager.o.fillAI = fillWithBots;
+        }
+		//option for if there are no players whatsoever
+        else if (Input.GetButtonDown("KB Pause") && fillWithBots)
+        {
+            GameManager.o.ChangeScene(1);
+			GameManager.o.fillAI = fillWithBots;
         }
     }
 }
@@ -234,5 +246,4 @@ public class MenuCharSelectWindow
 
         window.GetComponent<Image>().color = colorWindow;
     }
-
 }

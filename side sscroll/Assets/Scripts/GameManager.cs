@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     public bool pause = false;
     private float endTimer = 0f;
     public bool end = false;
+	
+	public bool fillAI = false;
 
     void Awake ()
     {
@@ -113,6 +115,19 @@ public class GameManager : MonoBehaviour
     {
         stage = FindObjectOfType<Stage>();
         PlayerBattleInterfaceScript[] hud = FindObjectsOfType<PlayerBattleInterfaceScript>();
+		
+		if(fillAI)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (!playerData[i].active)
+				{
+					//if inactive, make them active and set their input to AI
+					AddPlayer ("AI", i+6);
+				}
+			}
+		}
+		
         for (int i = 0; i < 4; i++)
         {
             if (!playerData[i].active)

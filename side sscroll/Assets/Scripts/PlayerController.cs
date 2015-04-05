@@ -73,12 +73,26 @@ public class PlayerController : MonoBehaviour
 
     protected bool inputLock = false;
     protected float lockTime;
+	
+	
+	//AI specific variables, DO NOT TOUCH -Erin
+	public AiBase ai;
+	public bool aiEnabled = false;
+	public float aiDirection = 0;//-1 left, 0 neutral, 1 right
+	public bool aiJump = false;//use to proc jump
+	public bool aiAttack = false;//use to melee attack
+	public bool aiSpecial = false;//use to special attack
+	public bool aiItem1 = false;//use to proc item 1
+	public bool aiItem2 = false;//use to proc item 2
+	public bool aiPickup1 = false;//used to initiate an item pickup
+	public bool aiPickup2 = false;//used to initiate an item pickup
 
     protected virtual void Start ()
     {
         physics = GetComponent<PlayerPhysics>();
         animator = GetComponent<CustomAnimator>();
         box = GetComponent<BoxCollider2D>();
+        ai = GetComponent<AiBase>();
         passives = new List<Item>();
 
         if (inputType == "Keyboard")
@@ -150,6 +164,11 @@ public class PlayerController : MonoBehaviour
             grab2 = "Joy4 Grab2";
             pause = "Joy4 Pause";
             select = "Joy4 Select";
+        }
+        else if (inputType == "AI")
+        {
+			ai.ourPlayer = this;//this activate the AI, essentially
+			aiEnabled = true;
         }
     }
     
@@ -444,6 +463,13 @@ public class PlayerController : MonoBehaviour
     #region Input Functions
     protected virtual bool Left ()
     {
+		if(aiEnabled)
+		{
+			if(aiDirection < 0)
+				return true;
+			else
+				return false;
+		}
         if (Input.GetAxis(horizontal) < 0)
             return true;
         else
@@ -452,22 +478,49 @@ public class PlayerController : MonoBehaviour
 
     protected virtual bool LeftPressed ()
     {
-        if (prevLeft == false && Left())
-            return true;
-        else
-            return false;
+		if(aiEnabled)
+		{
+			if(prevLeft == false && aiDirection < 0.5)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			if (prevLeft == false && Left())
+				return true;
+			else
+				return false;
+		}
     }
 
     protected virtual bool LeftReleased ()
     {
-        if (prevLeft == true && !Left())
-            return true;
-        else
-            return false;
+		if(aiEnabled)
+		{
+			if(prevLeft == false || aiDirection < 0)
+				return false;
+			else
+				return true;
+		}
+		else
+		{
+			if (prevLeft == true && !Left())
+				return true;
+			else
+				return false;
+		}
     }
     
     protected virtual bool Right ()
     {
+		if(aiEnabled)
+		{
+			if(aiDirection > 0.5)
+				return true;
+			else
+				return false;
+		}
         if (Input.GetAxis(horizontal) > 0)
             return true;
         else
@@ -476,22 +529,44 @@ public class PlayerController : MonoBehaviour
 
     protected virtual bool RightPressed ()
     {
-        if (prevRight == false && Right())
-            return true;
-        else
-            return false;
+		if(aiEnabled)
+		{
+			if(prevRight == false && aiDirection > 0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			if (prevRight == false && Right())
+				return true;
+			else
+				return false;
+		}
     }
 
     protected virtual bool RightReleased ()
     {
-        if (prevRight == true && !Right())
-            return true;
-        else
-            return false;
+		if(aiEnabled)
+		{
+			if(prevRight == false || aiDirection > 0)
+				return false;
+			else
+				return true;
+		}
+		else
+		{
+			if (prevRight == true && !Right())
+				return true;
+			else
+				return false;
+		}
     }
     
     protected virtual bool Up ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         if (Input.GetAxis(vertical) > 0)
             return true;
         else
@@ -516,6 +591,8 @@ public class PlayerController : MonoBehaviour
     
     protected virtual bool Down ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         if (Input.GetAxis(vertical) < 0)
             return true;
         else
@@ -540,36 +617,54 @@ public class PlayerController : MonoBehaviour
     
     protected virtual bool Jump ()
     {
+		if(aiEnabled)
+			return aiJump;
         return Input.GetButton(jump);
     }
     
     protected virtual bool JumpPressed ()
     {
-        return Input.GetButtonDown(jump);
+		if(aiEnabled)
+			return aiJump;
+		else
+			return Input.GetButtonDown(jump);
     }
     
     protected virtual bool JumpReleased ()
     {
-        return Input.GetButtonUp(jump);
+		if(aiEnabled)
+			return !aiJump;
+		else
+			return Input.GetButtonUp(jump);
     }
 
     protected virtual bool Attack ()
     {
-        return Input.GetButton(attack);
+		if(aiEnabled)
+			return false;//ai can't use this
+		return Input.GetButton(attack);
     }
     
     protected virtual bool AttackPressed ()
     {
-        return Input.GetButtonDown(attack);
+		if(aiEnabled)
+			return aiAttack;
+		else
+			return Input.GetButtonDown(attack);
     }
     
     protected virtual bool AttackReleased ()
     {
-        return Input.GetButtonUp(attack);
+		if(aiEnabled)
+			return !aiAttack;
+		else
+			return Input.GetButtonUp(attack);
     }
 
     protected virtual bool Special ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         if (inputType == "Keyboard")
             return Input.GetButton(special);
 
@@ -581,6 +676,9 @@ public class PlayerController : MonoBehaviour
     
     protected virtual bool SpecialPressed ()
     {
+		if(aiEnabled)
+			return aiSpecial;
+		
         if (inputType == "Keyboard")
             return Input.GetButtonDown(special);
         if (prevSpecial == false && Special())
@@ -591,6 +689,9 @@ public class PlayerController : MonoBehaviour
     
     protected virtual bool SpecialReleased ()
     {
+		if(aiEnabled)
+			return !aiSpecial;
+		
         if (inputType == "Keyboard")
             return Input.GetButtonUp(special);
         if (prevSpecial == true && !Special())
@@ -601,91 +702,135 @@ public class PlayerController : MonoBehaviour
 
     protected virtual bool Item1 ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         return Input.GetButton(item1);
     }
     
     protected virtual bool Item1Pressed ()
     {
+		if(aiEnabled)
+			return aiItem1;
+		
         return Input.GetButtonDown(item1);
     }
     
     protected virtual bool Item1Released ()
     {
+		if(aiEnabled)
+			return !aiItem1;
+		
         return Input.GetButtonUp(item1);
     }
 
     protected virtual bool Item2 ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         return Input.GetButton(item2);
     }
     
     protected virtual bool Item2Pressed ()
     {
+		if(aiEnabled)
+			return aiItem2;
+		
         return Input.GetButtonDown(item2);
     }
     
     protected virtual bool Item2Released ()
     {
+		if(aiEnabled)
+			return !aiItem2;
+		
         return Input.GetButtonUp(item2);
     }
 
     protected virtual bool Grab1 ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         return Input.GetButton(grab1);
     }
     
     protected virtual bool Grab1Pressed ()
     {
-        return Input.GetButtonDown(grab1);
+		if(aiEnabled)
+			return aiPickup1;
+		else
+			return Input.GetButtonDown(grab1);
     }
     
     protected virtual bool Grab1Released ()
     {
-        return Input.GetButtonUp(grab1);
+		if(aiEnabled)
+			return !aiPickup1;
+		else
+			return Input.GetButtonUp(grab1);
     }
 
     protected virtual bool Grab2 ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         return Input.GetButton(grab2);
     }
     
     protected virtual bool Grab2Pressed ()
     {
-        return Input.GetButtonDown(grab2);
+		if(aiEnabled)
+			return aiPickup2;
+		else
+			return Input.GetButtonDown(grab2);
     }
     
     protected virtual bool Grab2Released ()
     {
-        return Input.GetButtonUp(grab2);
+		if(aiEnabled)
+			return !aiPickup2;
+		else
+			return Input.GetButtonUp(grab2);
     }
 
     protected virtual bool Pause ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         return Input.GetButton(pause);
     }
     
     protected virtual bool PausePressed ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         return Input.GetButtonDown(pause);
     }
     
     protected virtual bool PauseReleased ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         return Input.GetButtonUp(pause);
     }
 
     protected virtual bool Select ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this
         return Input.GetButton(select);
     }
     
     protected virtual bool SelectPressed ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this YET
         return Input.GetButtonDown(select);
     }
     
     protected virtual bool SelectReleased ()
     {
+		if(aiEnabled)
+			return false;//ai can't use this YET
         return Input.GetButtonUp(select);
     }
     #endregion
