@@ -168,6 +168,17 @@ public class MenuCharSelect : MonoBehaviour
             GameManager.o.ChangeScene(1);
 			GameManager.o.fillAI = fillWithBots;
         }
+        else if (Input.GetButtonDown("Joy1 Pause") && fillWithBots)
+        {
+            GameManager.o.ChangeScene(1);
+			GameManager.o.fillAI = fillWithBots;
+        }
+		else if(GameManager.o.aiBroodmother.trainingMode)
+		{
+			//skip everything if the AI is in training mode, so it can loop around infinitely
+            GameManager.o.ChangeScene(1);
+			GameManager.o.fillAI = fillWithBots;
+		}
     }
 }
 

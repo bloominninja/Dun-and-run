@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviour
 	public AiBase ai;
 	public bool aiEnabled = false;
 	public float aiDirection = 0;//-1 left, 0 neutral, 1 right
+	public float aiLastDirection = 0;//-1 left, 0 neutral, 1 right
 	public bool aiJump = false;//use to proc jump
 	public bool aiAttack = false;//use to melee attack
 	public bool aiSpecial = false;//use to special attack
@@ -641,7 +642,7 @@ public class PlayerController : MonoBehaviour
     protected virtual bool Attack ()
     {
 		if(aiEnabled)
-			return false;//ai can't use this
+			return aiAttack;
 		return Input.GetButton(attack);
     }
     

@@ -8,6 +8,8 @@ public class AiBase : MonoBehaviour
 
     void Start ()
     {
+		//string text = System.IO.File.ReadAllText("myfile.txt");
+		System.IO.File.WriteAllText("AI/weights_", "7 microhitlers\ntesting");
     }
 	
     void Update ()
@@ -16,8 +18,11 @@ public class AiBase : MonoBehaviour
 		{
 			//do not touch it if we aren't able to do anything
 			//proc movement to the left just because
+			ourPlayer.aiLastDirection = ourPlayer.aiDirection;
 			ourPlayer.aiDirection = Random.Range(-10.0F, 10.0F);
 			ourPlayer.aiJump = true;
+			ourPlayer.aiAttack = true;
+			ourPlayer.aiSpecial = true;
 		}
 	}
 }

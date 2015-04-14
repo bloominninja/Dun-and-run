@@ -46,7 +46,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\AI\AITrainerManager.cs" />
      <Compile Include="Assets\Scripts\AI\AiBase.cs" />
+     <Compile Include="Assets\Scripts\AI\PlayerExternalAI.cs" />
      <Compile Include="Assets\Scripts\ActiveItem.cs" />
      <Compile Include="Assets\Scripts\Character Scripts\AnimatorHero.cs" />
      <Compile Include="Assets\Scripts\Character Scripts\ControllerHero.cs" />

@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     public bool end = false;
 	
 	public bool fillAI = false;
+	
+	public AiTrainerManager aiBroodmother = new AiTrainerManager();//do not interfere!
 
     void Awake ()
     {
@@ -32,7 +34,8 @@ public class GameManager : MonoBehaviour
             playerData[i] = new PlayerData();
         players = new List<PlayerController>();
         items = new List<Item>();
-
+		
+		aiBroodmother.gameManager = this;
 
         /*foreach (PlayerController p in (PlayerController[])FindObjectsOfType(typeof(PlayerController)))
         {
@@ -70,6 +73,9 @@ public class GameManager : MonoBehaviour
                 endTimer = 2;
             }
         }
+		
+		//tick the ai broodmother
+		aiBroodmother.Update();
     }
 
     public int AddPlayer (string control, int team)
@@ -106,7 +112,7 @@ public class GameManager : MonoBehaviour
         players.Clear();
         items.Clear();
         if (scene == 1)
-            Application.LoadLevel("Hud" + Mathf.Floor(Random.Range(1, 3)).ToString());
+            Application.LoadLevel("Hud" + Mathf.Floor(2).ToString());
         else if (scene == 0)
             Application.LoadLevel("Menu");
     }
@@ -120,6 +126,10 @@ public class GameManager : MonoBehaviour
 		{
 			for (int i = 0; i < 4; i++)
 			{
+				if (playerData == null)
+					continue;
+				if (playerData[i] == null)
+					continue;
 				if (!playerData[i].active)
 				{
 					//if inactive, make them active and set their input to AI
@@ -130,11 +140,24 @@ public class GameManager : MonoBehaviour
 		
         for (int i = 0; i < 4; i++)
         {
-            if (!playerData[i].active)
+			if (playerData == null)
+				continue;
+            if (playerData[i] == null)
                 continue;
+			if(!playerData[i].active)
+				continue;
+			
             GameObject prefab = Resources.Load<GameObject>("Prefabs/Characters/Player Hero");
             PlayerController p = Instantiate(prefab).GetComponent<PlayerController>();
             players.Add(p);
+			
+			//set the appropriate links for the broodmother
+			if(playerData[i].control.Equals("AI"))
+				//set the appropriate links for the broodmother
+				aiBroodmother.linkAI(players[i].ai, i+1);
+			else
+				aiBroodmother.linkAI(null, i+1);//this will reset the ai if not in use
+			
             p.transform.position = stage.playerSpawns[i].transform.position;
             p.team = playerData[i].team;
             p.inputType = playerData[i].control;
