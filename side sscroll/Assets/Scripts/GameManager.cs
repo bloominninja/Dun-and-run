@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
         items = new List<Item>();
 		
 		aiBroodmother.gameManager = this;
+		aiBroodmother.Start();
 
         /*foreach (PlayerController p in (PlayerController[])FindObjectsOfType(typeof(PlayerController)))
         {
@@ -47,6 +48,12 @@ public class GameManager : MonoBehaviour
             items.Add(i);
         }*/
     }
+	
+	public void OnDestroy()
+	{
+		//destroy our aiBroodmother
+		aiBroodmother.OnDestroy();
+	}
 	
     void Update ()
     {

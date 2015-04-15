@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
 	public AiBase ai;
 	public bool aiEnabled = false;
 	public float aiDirection = 0;//-1 left, 0 neutral, 1 right
-	public float aiLastDirection = 0;//-1 left, 0 neutral, 1 right
+	public bool aiIdle = false;//will override movement if true
 	public bool aiJump = false;//use to proc jump
 	public bool aiAttack = false;//use to melee attack
 	public bool aiSpecial = false;//use to special attack
@@ -466,7 +466,9 @@ public class PlayerController : MonoBehaviour
     {
 		if(aiEnabled)
 		{
-			if(aiDirection < 0)
+			if(aiIdle)
+				return false;
+			else if(aiDirection < 0)
 				return true;
 			else
 				return false;
@@ -481,7 +483,9 @@ public class PlayerController : MonoBehaviour
     {
 		if(aiEnabled)
 		{
-			if(prevLeft == false && aiDirection < 0.5)
+			if(aiIdle)
+				return false;
+			else if(prevLeft == false && aiDirection < 0.5)
 				return true;
 			else
 				return false;
@@ -499,7 +503,9 @@ public class PlayerController : MonoBehaviour
     {
 		if(aiEnabled)
 		{
-			if(prevLeft == false || aiDirection < 0)
+			if(aiIdle)
+				return true;
+			else if(prevLeft == false || aiDirection < 0)
 				return false;
 			else
 				return true;
@@ -517,7 +523,9 @@ public class PlayerController : MonoBehaviour
     {
 		if(aiEnabled)
 		{
-			if(aiDirection > 0.5)
+			if(aiIdle)
+				return false;
+			else if(aiDirection > 0.5)
 				return true;
 			else
 				return false;
@@ -532,7 +540,9 @@ public class PlayerController : MonoBehaviour
     {
 		if(aiEnabled)
 		{
-			if(prevRight == false && aiDirection > 0)
+			if(aiIdle)
+				return false;
+			else if(prevRight == false && aiDirection > 0)
 				return true;
 			else
 				return false;
@@ -550,7 +560,9 @@ public class PlayerController : MonoBehaviour
     {
 		if(aiEnabled)
 		{
-			if(prevRight == false || aiDirection > 0)
+			if(aiIdle)
+				return true;
+			else if(prevRight == false || aiDirection > 0)
 				return false;
 			else
 				return true;
@@ -704,7 +716,7 @@ public class PlayerController : MonoBehaviour
     protected virtual bool Item1 ()
     {
 		if(aiEnabled)
-			return false;//ai can't use this
+			return aiItem1;
         return Input.GetButton(item1);
     }
     
@@ -727,7 +739,7 @@ public class PlayerController : MonoBehaviour
     protected virtual bool Item2 ()
     {
 		if(aiEnabled)
-			return false;//ai can't use this
+			return aiItem2;
         return Input.GetButton(item2);
     }
     
@@ -750,7 +762,7 @@ public class PlayerController : MonoBehaviour
     protected virtual bool Grab1 ()
     {
 		if(aiEnabled)
-			return false;//ai can't use this
+			return aiPickup1;
         return Input.GetButton(grab1);
     }
     
@@ -773,7 +785,7 @@ public class PlayerController : MonoBehaviour
     protected virtual bool Grab2 ()
     {
 		if(aiEnabled)
-			return false;//ai can't use this
+			return aiPickup2;
         return Input.GetButton(grab2);
     }
     

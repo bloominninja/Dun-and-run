@@ -20,17 +20,68 @@ public class AiTrainerManager
 	//this is used to denote what stage of the mode is active
 	public string externalStage = "Training";
 	int currentGenome = 1;
-	int maxGenome = 64;
+	const int maxGenome = 64;
+	int currentSet = 1;
+	int totalIterations = 1;
+	
+	int genomesPerSet = 4;
 	
 	const double timerReset = 30;
 	
 	double lastTime = timerReset;
 	double timer = timerReset;//timerReset seconds per cycle default
+	
+	ArrayList[] inputToLayer1Genes = new ArrayList[maxGenome];
+	ArrayList[] layer1ToLayer2Genes = new ArrayList[maxGenome];
+	ArrayList[] layer2ToOutputGenes = new ArrayList[maxGenome];
+	
+	//for our reference
+	int inputLayerCount = 102;
+	int layer1Count = 20;
+	int layer2Count = 20;
+	int outputLayerCount = 8;
 
 	// Use this for initialization
 	public void Start ()
 	{
+		//create the genome storage
+		for(int i=0; i<maxGenome; i++)
+		{
+			inputToLayer1Genes[i] = new ArrayList();
+			layer1ToLayer2Genes[i] = new ArrayList();
+			layer2ToOutputGenes[i] = new ArrayList();
+		}
 		
+		//generate the data (random for now)
+		for(int i=0; i<maxGenome; i++)
+		{
+			for(int j=0; j<inputLayerCount*layer1Count; j++)
+			{
+				inputToLayer1Genes[i].Add(UnityEngine.Random.Range(-10.0F, 10.0F));
+			}
+			for(int j=0; j<layer1Count*layer2Count; j++)
+			{
+				layer1ToLayer2Genes[i].Add(UnityEngine.Random.Range(-10.0F, 10.0F));
+			}
+			for(int j=0; j<layer2Count*outputLayerCount; j++)
+			{
+				layer2ToOutputGenes[i].Add(UnityEngine.Random.Range(-10.0F, 10.0F));
+			}
+		}
+	}
+	
+	public void OnDestroy()
+	{
+		//store our genomes quickly!
+		
+		
+		//destroy the genome storage
+		for(int i=0; i<maxGenome; i++)
+		{
+			inputToLayer1Genes[i].Clear();
+			layer1ToLayer2Genes[i].Clear();
+			layer2ToOutputGenes[i].Clear();
+		}
 	}
 	
 	// Update is called once per frame
@@ -44,7 +95,7 @@ public class AiTrainerManager
 			
 			if(lastTime > Math.Floor(timer))
 			{
-				Debug.Log("AI Timer: "+(lastTime.ToString()));
+				Debug.Log("AI Timer: "+(lastTime.ToString())+" of set "+(currentSet.ToString())+". Iteration "+(totalIterations.ToString()));
 				lastTime = Math.Floor(timer);
 			}
 			
@@ -58,6 +109,19 @@ public class AiTrainerManager
 				lastTime = timerReset;
 				
 				//make sure to step our genetic process here!
+				currentSet++;
+				
+				//attempt to load in all of the weights for this set to our precious little AI
+				
+				if(currentSet*genomesPerSet > maxGenome)
+				{
+					//mix genetics here
+					
+					//reset our stats
+					currentSet = 1;
+					totalIterations++;
+					currentGenome = 1;
+				}
 			}
 		}
 	}
