@@ -21,7 +21,7 @@ public class AiTrainerManager
 	public string externalStage = "Training";
 	int currentGenome = 1;
 	const int maxGenome = 64;
-	int currentSet = 1;
+	int currentSet = 0;
 	int totalIterations = 1;
 	
 	int genomesPerSet = 4;
@@ -29,7 +29,7 @@ public class AiTrainerManager
 	const double timerReset = 30;
 	
 	double lastTime = timerReset;
-	double timer = timerReset;//timerReset seconds per cycle default
+	double timer = 0;//timerReset seconds per cycle default
 	
 	ArrayList[] inputToLayer1Genes = new ArrayList[maxGenome];
 	ArrayList[] layer1ToLayer2Genes = new ArrayList[maxGenome];
