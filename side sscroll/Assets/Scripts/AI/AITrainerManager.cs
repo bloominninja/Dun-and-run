@@ -13,7 +13,9 @@ public class AiTrainerManager
 	public AiBase ai3 = null;
 	public AiBase ai4 = null;
 	
-	public bool trainingMode = true;
+	public bool trainingMode = false;
+	public bool runningMode = false;
+	public bool disabled = false;
 	
 	public GameManager gameManager = null;
 	
@@ -26,7 +28,7 @@ public class AiTrainerManager
 	
 	int genomesPerSet = 4;
 	
-	const double timerReset = 30;
+	const double timerReset = 10;
 	
 	double lastTime = timerReset;
 	double timer = 0;//timerReset seconds per cycle default
@@ -39,11 +41,16 @@ public class AiTrainerManager
 	int inputLayerCount = 102;
 	int layer1Count = 20;
 	int layer2Count = 20;
-	int outputLayerCount = 8;
+	int outputLayerCount = 9;
 
 	// Use this for initialization
 	public void Start ()
 	{
+		disabled = !trainingMode && !runningMode;
+		
+		if(disabled)
+			return;
+		
 		//create the genome storage
 		for(int i=0; i<maxGenome; i++)
 		{
@@ -68,6 +75,9 @@ public class AiTrainerManager
 				layer2ToOutputGenes[i].Add(UnityEngine.Random.Range(-10.0F, 10.0F));
 			}
 		}
+		
+		//shuffle our pool here
+		shuffleGeneticPool();
 	}
 	
 	public void OnDestroy()
@@ -87,6 +97,9 @@ public class AiTrainerManager
 	// Update is called once per frame
 	public void Update ()
 	{
+		if(disabled)
+			return;
+		
 		//get the match state
 		//do not tick if there is no match
 		if(gameManager.stage != null && !gameManager.end)
@@ -111,7 +124,7 @@ public class AiTrainerManager
 				//make sure to step our genetic process here!
 				currentSet++;
 				
-				//attempt to load in all of the weights for this set to our precious little AI
+				loadAI();
 				
 				if(currentSet*genomesPerSet > maxGenome)
 				{
@@ -122,6 +135,38 @@ public class AiTrainerManager
 					totalIterations++;
 					currentGenome = 1;
 				}
+			}
+		}
+	}
+	
+	public void loadAI()
+	{
+		if(currentGenome < maxGenome)
+		{
+			//attempt to load in all of the weights for this set to our precious little AI
+			if(ai1 != null)
+			{
+				Debug.Log("Loading an AI for Player 1! Genome "+currentGenome.ToString());
+				loadNetwork(ai1);
+				currentGenome++;
+			}
+			if(ai2 != null)
+			{
+				Debug.Log("Loading an AI for Player 2! Genome "+currentGenome.ToString());
+				loadNetwork(ai2);
+				currentGenome++;
+			}
+			if(ai3 != null)
+			{
+				Debug.Log("Loading an AI for Player 3! Genome "+currentGenome.ToString());
+				loadNetwork(ai3);
+				currentGenome++;
+			}
+			if(ai4 != null)
+			{
+				Debug.Log("Loading an AI for Player 4! Genome "+currentGenome.ToString());
+				loadNetwork(ai4);
+				currentGenome++;
 			}
 		}
 	}
@@ -156,11 +201,26 @@ public class AiTrainerManager
 	//the shuffle algorithm for shuffling our genetic sets
 	public void shuffleGeneticPool()
 	{
-		
+		for (int i = maxGenome - 1; i > 0; i--) {
+			int r = UnityEngine.Random.Range(0,i);
+			ArrayList tmp1 = inputToLayer1Genes[i];
+			ArrayList tmp2 = layer1ToLayer2Genes[i];
+			ArrayList tmp3 = layer2ToOutputGenes[i];
+			inputToLayer1Genes[i] = inputToLayer1Genes[r];
+			layer1ToLayer2Genes[i] = layer1ToLayer2Genes[r];
+			layer2ToOutputGenes[i] = layer2ToOutputGenes[r];
+			inputToLayer1Genes[r] = tmp1;
+			layer1ToLayer2Genes[r] = tmp2;
+			layer2ToOutputGenes[r] = tmp3;
+		}
 	}
 	
 	public void linkAI(AiBase playerAI, int index)
-	{
+	{		
+		if(playerAI == null)
+			Debug.Log("Clearing AI Slot "+index.ToString());
+	
+		//don't forget to generate their networks when we do this!
 		switch(index)
 		{
 			case 1:
@@ -176,6 +236,19 @@ public class AiTrainerManager
 				ai4 = playerAI;
 				break;
 		}
+	}
+	
+	public void loadNetwork(AiBase ai)
+	{
+		double[] inputLayer1 = new double[inputLayerCount*layer1Count];
+		double[] layer1Layer2 = new double[layer2Count*layer1Count];
+		double[] layer2Output = new double[layer2Count*outputLayerCount];
+		
+		inputToLayer1Genes[currentGenome-1].CopyTo( inputLayer1 );
+		layer1ToLayer2Genes[currentGenome-1].CopyTo( layer1Layer2 );
+		layer2ToOutputGenes[currentGenome-1].CopyTo( layer2Output );
+		
+		ai.createNetwork(inputLayer1, layer1Layer2, layer2Output);
 	}
 	
 }

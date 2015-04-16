@@ -90,10 +90,8 @@ public class AiBase : MonoBehaviour
 	int layer1Count = 20;
 	Node nodeLayer2 = null;//20 of these
 	int layer2Count = 20;
-	Node nodeLayerOutput = null;//one for each possible output, highest output weight of competing outputs is used, idle is used for taking no action of category
-		//need left, right, jump, idle for movement
-		//need idle, Melee Attack and Ranged Attack and active items for actions
-	int outputLayerCount = 8;
+	Node nodeLayerOutput = null;
+	int outputLayerCount = 9;
 		
 	double score = 0;//this is our performance with this genetic layout, higher score = better
 		//modified during gameplay at real-time
@@ -102,7 +100,7 @@ public class AiBase : MonoBehaviour
 		//use this data for calculating the score, such as trickshots
 		//may be useful for stats screen?
 	
-	protected float aiLastDirection = 0;
+	protected double aiLastDirection = 0;
 
     void Start ()
     {
@@ -114,12 +112,22 @@ public class AiBase : MonoBehaviour
     {
 		if(ourPlayer!=null)
 		{
+			//get game status info
+			pollInputs();
+			
+			calculateOutputs();//run data through the machine
+			
+			//use the outputs of the network
+			readOutputs();
+			
 			//do not touch it if we aren't able to do anything
 			//proc movement to the left just because
 			if(ourPlayer.aiIdle)
 				aiLastDirection = 0;
 			else
 				aiLastDirection = ourPlayer.aiDirection;
+			
+			//check the outputs of calculation
 			
 			//ourPlayer.aiIdle = false;
 			
@@ -139,9 +147,11 @@ public class AiBase : MonoBehaviour
 	
 	//this function will create our neural network, must pass in ALL weights needed here
 	//all weights are from name->nextLayer
-	void createNetwork(double[] inputWeights, double[] layer1Weights, double[] layer2Weights)
+	public void createNetwork(double[] inputWeights, double[] layer1Weights, double[] layer2Weights)
 	{
 		//destroy our network before we can create a new network
+		destroyNetwork();
+		
 		//start with creating nodes for each layer
 		//input layer has 102 inputs between the four characters
 		for(int i=0; i<inputLayerCount; i++)
@@ -382,6 +392,222 @@ public class AiBase : MonoBehaviour
 	
 			iterator = iterator.next;
 		}
+	}
+	
+	void pollInputs()
+	{
+		if(ourPlayer == null)
+			return;//don't run without a player
+		
+		Node currNode = null;
+		//Our passives
+		//Our cooldowns
+		//Time since last jump (jump cooldown)
+		//Other player data
+			//Position (x, y)
+			//Distance from us (dx, dy)
+			//health, max health
+			//mana, max mana
+			//Character (int for character id with gaps of 1000, no player is -1000)
+			//Attack/item cooldowns
+			//Active items (int for each item id * 100)
+			//Passive items (int for each item id * 100, -1 for no passive here)
+			//Time since last jump (jump cooldown)
+		
+		//get our x and y
+		currNode = getNode(nodeLayerInput, 0);
+		if(currNode != null)
+			currNode.value = ourPlayer.transform.position.x;
+		
+		currNode = getNode(nodeLayerInput, 1);
+		if(currNode != null)
+			currNode.value = ourPlayer.transform.position.y;
+		
+		currNode = getNode(nodeLayerInput, 2);
+		if(currNode != null)
+			currNode.value = ourPlayer.currentHealth;
+		
+		currNode = getNode(nodeLayerInput, 3);
+		if(currNode != null)
+			currNode.value = ourPlayer.maxHealth;
+		
+		currNode = getNode(nodeLayerInput, 4);
+		if(currNode != null)
+			currNode.value = ourPlayer.currentMagic;
+		
+		currNode = getNode(nodeLayerInput, 5);
+		if(currNode != null)
+			currNode.value = ourPlayer.maxMagic;
+		
+		currNode = getNode(nodeLayerInput, 6);
+		if(currNode != null)
+			currNode.value = 1;//character ID, change later
+		
+		currNode = getNode(nodeLayerInput, 7);
+		if(currNode != null)
+			currNode.value = 1;//Item 1 ID, change later
+		
+		currNode = getNode(nodeLayerInput, 8);
+		if(currNode != null)
+			currNode.value = 2;//Item 2 ID, change later
+		
+		currNode = getNode(nodeLayerInput, 9);
+		if(currNode != null)
+			currNode.value = 0;//Item 1 CD, change later
+		
+		currNode = getNode(nodeLayerInput, 10);
+		if(currNode != null)
+			currNode.value = 0;//Item 2 CD, change later
+		
+		//attack cooldowns
+		
+		//passives here
+		
+		//jump cd
+	}
+	
+	void readOutputs()
+	{
+		if(ourPlayer == null)
+			return;//don't run without a player
+		
+		Node currNode = null;
+		
+		//move left or right
+		currNode = getNode(nodeLayerOutput, 0);
+		if(currNode != null)
+		{
+			ourPlayer.aiDirection = currNode.value-0.25;
+		}
+		
+		//get our jump
+		currNode = getNode(nodeLayerOutput, 1);
+		if(currNode != null)
+		{
+			if(currNode.value > 0.5)
+			{
+				ourPlayer.aiJump = true;
+				score+=1;//give reward for jumping (will be outweighed by jumping badly in many positions)
+			}
+			else
+			{
+				ourPlayer.aiJump = false;
+			}
+		}
+		
+		//attacking
+		currNode = getNode(nodeLayerOutput, 2);
+		if(currNode != null)
+		{
+			if(currNode.value > 0.5)
+			{
+				ourPlayer.aiAttack = true;
+				score+=1;//give reward for attacking
+			}
+			else
+			{
+				ourPlayer.aiAttack = false;
+			}
+		}
+		
+		//special attacking
+		currNode = getNode(nodeLayerOutput, 3);
+		if(currNode != null)
+		{
+			if(currNode.value > 0.5)
+			{
+				ourPlayer.aiSpecial = true;
+				score+=1;//give reward for attacking
+			}
+			else
+			{
+				ourPlayer.aiSpecial = false;
+			}
+		}
+		
+		//idle
+		currNode = getNode(nodeLayerOutput, 4);
+		if(currNode != null)
+		{
+			if(currNode.value > 0.5)
+			{
+				ourPlayer.aiIdle = true;
+			}
+			else
+			{
+				ourPlayer.aiIdle = false;
+				score+=1;//give reward for not sitting there
+			}
+		}
+		
+		//items
+		currNode = getNode(nodeLayerOutput, 5);
+		if(currNode != null)
+		{
+			if(currNode.value > 0.5)
+			{
+				ourPlayer.aiItem1 = true;
+			}
+			else
+			{
+				ourPlayer.aiItem1 = false;
+				score+=1;//give reward for saving items
+			}
+		}
+		currNode = getNode(nodeLayerOutput, 6);
+		if(currNode != null)
+		{
+			if(currNode.value > 0.5)
+			{
+				ourPlayer.aiItem2 = true;
+			}
+			else
+			{
+				ourPlayer.aiItem2 = false;
+				score+=1;//give reward for saving items
+			}
+		}
+		
+		//pickup items
+		currNode = getNode(nodeLayerOutput, 7);
+		if(currNode != null)
+		{
+			if(currNode.value > 0.5)
+			{
+				ourPlayer.aiPickup1 = true;
+				score+=1;//give reward for grabbing items
+			}
+			else
+			{
+				ourPlayer.aiPickup1 = false;
+			}
+		}
+		currNode = getNode(nodeLayerOutput, 8);
+		if(currNode != null)
+		{
+			if(currNode.value > 0.5)
+			{
+				ourPlayer.aiPickup2 = true;
+				score+=1;//give reward for grabbing items
+			}
+			else
+			{
+				ourPlayer.aiPickup2 = false;
+			}
+		}
+	}
+	
+	Node getNode(Node head, int index)
+	{
+		Node iterator = head;
+		
+		while(iterator!= null && index > 1)
+		{
+			iterator = iterator.next;
+			index--;
+		}
+		
+		return iterator;
 	}
 	
 	//calculates our score metric based on parameters

@@ -160,10 +160,14 @@ public class GameManager : MonoBehaviour
 			
 			//set the appropriate links for the broodmother
 			if(playerData[i].control.Equals("AI"))
+			{				
 				//set the appropriate links for the broodmother
-				aiBroodmother.linkAI(players[i].ai, i+1);
+				aiBroodmother.linkAI(players[i].GetComponent<AiBase>(), i+1);
+			}
 			else
+			{
 				aiBroodmother.linkAI(null, i+1);//this will reset the ai if not in use
+			}
 			
             p.transform.position = stage.playerSpawns[i].transform.position;
             p.team = playerData[i].team;
@@ -185,6 +189,9 @@ public class GameManager : MonoBehaviour
             items.Add(itemtemp);
             itemtemp.transform.position = stage.chestSpawns[i].transform.position;
         }
+		
+		//load AI, does not work if none are selected
+		aiBroodmother.loadAI();
     }
 }
 

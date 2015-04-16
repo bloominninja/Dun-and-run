@@ -7,7 +7,7 @@ public class MenuCharSelect : MonoBehaviour
     public GameObject[] players;
     public MenuCharSelectWindow[] windows;
 
-	protected bool fillWithBots = true;//default to true for now to test
+	protected bool fillWithBots = false;//default to true for now to test
 
     private int i;
 

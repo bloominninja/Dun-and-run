@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
 	//AI specific variables, DO NOT TOUCH -Erin
 	public AiBase ai;
 	public bool aiEnabled = false;
-	public float aiDirection = 0;//-1 left, 0 neutral, 1 right
+	public double aiDirection = 0;//-1 left, 0 neutral, 1 right
 	public bool aiIdle = false;//will override movement if true
 	public bool aiJump = false;//use to proc jump
 	public bool aiAttack = false;//use to melee attack
