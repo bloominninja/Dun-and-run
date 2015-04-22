@@ -9,6 +9,7 @@ public class Item : MonoBehaviour
     protected BoxCollider2D box;
     public bool held = false;
     protected PlayerController i;
+    public bool inChest = false;
 
     // Use this for initialization
     protected virtual void Start ()
@@ -22,14 +23,15 @@ public class Item : MonoBehaviour
     {
         if (GameManager.o.pause)
             return;
-        if (!held)
+        if (!held && !inChest)
             physics.Move(Vector2.zero);
     }
 
     protected virtual void LateUpdate ()
     {
-        if (!held)
+        if (!held && !inChest)
         {
+            GetComponent<Renderer>().enabled = true;
             foreach (PlayerController i in GameManager.o.players)
             {
                 if (box.bounds.Intersects(i.box.bounds))
@@ -39,18 +41,20 @@ public class Item : MonoBehaviour
                 }
             }
         }
+        else
+            GetComponent<Renderer>().enabled = false;
     }
 
     public virtual void OnPickup (PlayerController player)
     {
         held = true;
-        GetComponent<SpriteRenderer>().enabled = false;
+        //GetComponent<SpriteRenderer>().enabled = false;
     }
 
     public virtual void OnDrop (PlayerController player)
     {
         held = false;
-        GetComponent<Renderer>().enabled = true;
+        //GetComponent<Renderer>().enabled = true;
         transform.position = player.transform.position;
     }
 

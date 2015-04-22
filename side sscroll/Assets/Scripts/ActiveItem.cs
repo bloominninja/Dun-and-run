@@ -20,8 +20,9 @@ public class ActiveItem : Item
 
     protected override void LateUpdate ()
     {
-        if (!held)
+        if (!held && !inChest)
         {
+            GetComponent<Renderer>().enabled = true;
             foreach (PlayerController i in GameManager.o.players)
             {
                 if (i.grab)
@@ -34,6 +35,8 @@ public class ActiveItem : Item
                 }
             }
         }
+        else
+            GetComponent<Renderer>().enabled = false;
 
     }
 

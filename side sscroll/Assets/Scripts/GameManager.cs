@@ -15,9 +15,9 @@ public class GameManager : MonoBehaviour
     private float endTimer = 0f;
     public bool end = false;
 	
-	public bool fillAI = false;
+    public bool fillAI = false;
 	
-	public AiTrainerManager aiBroodmother = new AiTrainerManager();//do not interfere!
+    public AiTrainerManager aiBroodmother = new AiTrainerManager();//do not interfere!
 
     void Awake ()
     {
@@ -35,8 +35,8 @@ public class GameManager : MonoBehaviour
         players = new List<PlayerController>();
         items = new List<Item>();
 		
-		aiBroodmother.gameManager = this;
-		aiBroodmother.Start();
+        aiBroodmother.gameManager = this;
+        aiBroodmother.Start();
 
         /*foreach (PlayerController p in (PlayerController[])FindObjectsOfType(typeof(PlayerController)))
         {
@@ -49,11 +49,11 @@ public class GameManager : MonoBehaviour
         }*/
     }
 	
-	public void OnDestroy()
-	{
-		//destroy our aiBroodmother
-		aiBroodmother.OnDestroy();
-	}
+    public void OnDestroy ()
+    {
+        //destroy our aiBroodmother
+        aiBroodmother.OnDestroy();
+    }
 	
     void Update ()
     {
@@ -81,8 +81,8 @@ public class GameManager : MonoBehaviour
             }
         }
 		
-		//tick the ai broodmother
-		aiBroodmother.Update();
+        //tick the ai broodmother
+        aiBroodmother.Update();
     }
 
     public int AddPlayer (string control, int team)
@@ -129,45 +129,45 @@ public class GameManager : MonoBehaviour
         stage = FindObjectOfType<Stage>();
         PlayerBattleInterfaceScript[] hud = FindObjectsOfType<PlayerBattleInterfaceScript>();
 		
-		if(fillAI)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				if (playerData == null)
-					continue;
-				if (playerData[i] == null)
-					continue;
-				if (!playerData[i].active)
-				{
-					//if inactive, make them active and set their input to AI
-					AddPlayer ("AI", i+6);
-				}
-			}
-		}
+        if (fillAI)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (playerData == null)
+                    continue;
+                if (playerData[i] == null)
+                    continue;
+                if (!playerData[i].active)
+                {
+                    //if inactive, make them active and set their input to AI
+                    AddPlayer("AI", i + 6);
+                }
+            }
+        }
 		
         for (int i = 0; i < 4; i++)
         {
-			if (playerData == null)
-				continue;
+            if (playerData == null)
+                continue;
             if (playerData[i] == null)
                 continue;
-			if(!playerData[i].active)
-				continue;
+            if (!playerData[i].active)
+                continue;
 			
             GameObject prefab = Resources.Load<GameObject>("Prefabs/Characters/Player Hero");
             PlayerController p = Instantiate(prefab).GetComponent<PlayerController>();
             players.Add(p);
 			
-			//set the appropriate links for the broodmother
-			if(playerData[i].control.Equals("AI"))
-			{				
-				//set the appropriate links for the broodmother
-				aiBroodmother.linkAI(players[i].GetComponent<AiBase>(), i+1);
-			}
-			else
-			{
-				aiBroodmother.linkAI(null, i+1);//this will reset the ai if not in use
-			}
+            //set the appropriate links for the broodmother
+            if (playerData[i].control.Equals("AI"))
+            {				
+                //set the appropriate links for the broodmother
+                aiBroodmother.linkAI(players[i].GetComponent<AiBase>(), i + 1);
+            }
+            else
+            {
+                aiBroodmother.linkAI(null, i + 1);//this will reset the ai if not in use
+            }
 			
             p.transform.position = stage.playerSpawns[i].transform.position;
             p.team = playerData[i].team;
@@ -188,10 +188,14 @@ public class GameManager : MonoBehaviour
             Item itemtemp = Instantiate(itemarr[(int)Mathf.Floor(Random.Range(0, itemarr.Length))]).GetComponent<Item>();
             items.Add(itemtemp);
             itemtemp.transform.position = stage.chestSpawns[i].transform.position;
+            Chest chest = Instantiate(Resources.Load<Chest>("Prefabs/Chest")).GetComponent<Chest>();
+            chest.transform.position = stage.chestSpawns[i].transform.position;
+            chest.item = itemtemp;
+            itemtemp.inChest = true;
         }
 		
-		//load AI, does not work if none are selected
-		aiBroodmother.loadAI();
+        //load AI, does not work if none are selected
+        aiBroodmother.loadAI();
     }
 }
 
