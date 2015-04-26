@@ -41,5 +41,10 @@ public class Projectile : MonoBehaviour
     {
         Destroy(this.gameObject);
     }
+	
+	public PlayerController getSource()
+	{
+		return i;
+	}
 
 }

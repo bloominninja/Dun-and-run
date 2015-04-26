@@ -61,9 +61,9 @@ public class ControllerHero : PlayerController
         }
     }
 
-    public override void Damage (int damage, int dir)
+    public override void Damage (int damage, int dir, PlayerController source)
     {
-        base.Damage(damage, dir);
+        base.Damage(damage, dir, source);
         animator.attacking = false;
         animator.special = false;
         projBasicLeft.Deactivate();

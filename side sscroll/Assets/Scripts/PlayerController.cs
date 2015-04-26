@@ -302,6 +302,14 @@ public class PlayerController : MonoBehaviour
                     extraJumpsCurrent --;
                     physics.SetSpeedY(jumpHeight, 0.15f);
                 }
+				else if(extraJumpsCurrent == 0 && JumpPressed() && inputType == "AI")
+				{
+					//for scoring the AI for mistakes
+					if(ai != null)
+					{
+						ai.score -= 0.25;
+					}
+				}
 
                 if (AttackPressed())
                     AttackEffect();
@@ -354,12 +362,24 @@ public class PlayerController : MonoBehaviour
 
     protected virtual void AttackEffect ()
     {
-
+		if(inputType == "AI")
+		{
+			if(ai!=null)
+			{
+				ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
+			}
+		}
     }
 
     protected virtual void SpecialEffect ()
     {
-
+		if(inputType == "AI")
+		{
+			if(ai!=null)
+			{
+				ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
+			}
+		}
     }
 
     public virtual void Bounce (GameObject other, Vector2 sp)
@@ -440,7 +460,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
     
-    public virtual void Damage (int damage, int dir)
+    public virtual void Damage (int damage, int dir, PlayerController source)
     {
         currentHealth -= damage;
         //if (currentHealth <= 0)
@@ -451,6 +471,15 @@ public class PlayerController : MonoBehaviour
         physics.SetSpeedY(jumpHeight * knockbackMult, 0);
         direction = dir * -1;
         animator.hurt = true;
+		
+		//score depending on source if we are an AI
+		if(inputType == "AI")
+		{
+			if(source != this)
+				ai.score += damage*200;
+			else
+				ai.score -= damage*300;
+		}
     }
 
     public virtual void LockInput (float time)

@@ -15,6 +15,6 @@ public class ProjectileHeroBasic : MeleeProjectile
     
     public override void Effect (PlayerController player)
     {
-        player.Damage(1, direction);
+        player.Damage(1, direction, getSource());
     }
 }
