@@ -12,6 +12,7 @@ public class CustomAnimator : MonoBehaviour
     public bool special = false;
     public bool item = false;
     public bool hurt = false;
+    public bool specialFire = false;
 
     protected Vector3 t;
 

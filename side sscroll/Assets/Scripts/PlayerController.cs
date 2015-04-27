@@ -40,6 +40,11 @@ public class PlayerController : MonoBehaviour
     public bool
         grab = false;
 
+    //unique number to distinguish which character is in use, set by the prefabs
+    //0 is none, and if on an existing character should be treated as an error
+    //1 is hero, 2 is princess, 3 is soldier, 4 is hunter
+    public int id = 0;
+
     //protected Values
     [HideInInspector]
     public PlayerPhysics
@@ -48,6 +53,10 @@ public class PlayerController : MonoBehaviour
     //[HideInInspector]
     public BoxCollider2D
         box;
+    
+    public int controlScheme = 0;
+    protected bool pickupToggle = false;
+    protected float wallJump = 0;
 
     //input-focused variables
     public string inputType = "Keyboard";
@@ -69,7 +78,7 @@ public class PlayerController : MonoBehaviour
     protected bool prevRight = false;
     protected bool prevUp = false;
     protected bool prevDown = false;
-    protected bool prevSpecial = false;
+    public bool prevSpecial = false;
 
     protected bool inputLock = false;
     protected float lockTime;
@@ -166,6 +175,34 @@ public class PlayerController : MonoBehaviour
             pause = "Joy4 Pause";
             select = "Joy4 Select";
         }
+        else if (inputType == "Xcade1")
+        {
+            horizontal = "Xcade1 Horizontal";
+            vertical = "Xcade1 Vertical";
+            jump = "Xcade1 Jump";
+            attack = "Xcade1 Attack";
+            special = "Xcade1 Special";
+            item1 = "Xcade1 Item1";
+            item2 = "Xcade1 Item2";
+            grab1 = "Xcade1 Grab1";
+            grab2 = "Xcade1 Grab2";
+            pause = "Xcade1 Pause";
+            select = "Xcade1 Select";
+        }
+        else if (inputType == "Xcade2")
+        {
+            horizontal = "Xcade2 Horizontal";
+            vertical = "Xcade2 Vertical";
+            jump = "Xcade2 Jump";
+            attack = "Xcade2 Attack";
+            special = "Xcade2 Special";
+            item1 = "Xcade2 Item1";
+            item2 = "Xcade2 Item2";
+            grab1 = "Xcade2 Grab1";
+            grab2 = "Xcade2 Grab2";
+            pause = "Xcade2 Pause";
+            select = "Xcade2 Select";
+        }
         else if (inputType == "AI")
         {
             ai.ourPlayer = this;//this activate the AI, essentially
@@ -214,6 +251,14 @@ public class PlayerController : MonoBehaviour
                 active1CooldownCurrent -= Time.deltaTime;
             if (active2CooldownCurrent > 0)
                 active2CooldownCurrent -= Time.deltaTime;
+            
+            if (wallJump != 0)
+            {
+                if (Time.deltaTime > Mathf.Abs(wallJump))
+                    wallJump = 0;
+                else
+                    wallJump -= Time.deltaTime * Mathf.Sign(wallJump);
+            }
 
             grab = false;
             s = Vector2.zero;
@@ -255,81 +300,151 @@ public class PlayerController : MonoBehaviour
                 }
                 else if (physics.collideRight)
                 {
-                    if (Right() && physics.ledge > 0 && physics.speed.y <= 0)
+                    if (Right())
                     {
-                        transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
-                        if (JumpPressed())
+                        wallJump = 0.1f;
+                        if (physics.ledge > 0 && physics.speed.y <= 0)
                         {
-                            physics.SetSpeedY(jumpHeight, 0.15f);
+                            transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
+                            if (JumpPressed())
+                            {
+                                physics.SetSpeedY(jumpHeight, 0.15f);
+                                wallJump = 0;
+                            }
+                            else
+                                physics.SetSpeedY(0, 0);
                         }
-                        else
-                            physics.SetSpeedY(0, 0);
+                        else if (physics.speed.y <= -physics.gravity / 4)
+                        {
+                            physics.SetSpeedY(-physics.gravity / 4, 0);
+                        }
                     }
-                    else if (JumpPressed())
+                    
+                    if (wallJump != 0 && JumpPressed())
                     {
                         physics.SetSpeedX(-speed, 0.15f);
                         physics.SetSpeedY(jumpHeight, 0.15f);
-                    }
-                    else if (Right() && physics.speed.y <= -physics.gravity / 4)
-                    {
-                        physics.SetSpeedY(-physics.gravity / 4, 0);
+                        wallJump = 0;
                     }
                 }
                 else if (physics.collideLeft)
                 {
-                    if (Left() && physics.ledge > 0 && physics.speed.y <= 0)
+                    if (Left())
                     {
-                        transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
-                        if (JumpPressed())
+                        wallJump = -0.1f;
+                        if (physics.ledge > 0 && physics.speed.y <= 0)
                         {
-                            physics.SetSpeedY(jumpHeight, 0.15f);
+                            transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
+                            if (JumpPressed())
+                            {
+                                physics.SetSpeedY(jumpHeight, 0.15f);
+                                wallJump = 0;
+                            }
+                            else
+                                physics.SetSpeedY(0, 0);
                         }
-                        else
-                            physics.SetSpeedY(0, 0);
+                        else if (physics.speed.y <= -physics.gravity / 4)
+                        {
+                            physics.SetSpeedY(-physics.gravity / 4, 0);
+                        }
                     }
-                    else if (JumpPressed())
+                    
+                    if (wallJump != 0 && JumpPressed())
+                    {
+                        
+                        physics.SetSpeedX(speed, 0.15f);
+                        physics.SetSpeedY(jumpHeight, 0.15f);
+                        wallJump = 0;
+                    }
+                }
+                else if (wallJump != 0 && JumpPressed())
+                {
+                    if (wallJump > 0)
+                    {
+                        physics.SetSpeedX(-speed, 0.15f);
+                        physics.SetSpeedY(jumpHeight, 0.15f);
+                    }
+                    else
                     {
                         physics.SetSpeedX(speed, 0.15f);
                         physics.SetSpeedY(jumpHeight, 0.15f);
                     }
-                    else if (Left() && physics.speed.y <= -physics.gravity / 4)
-                    {
-                        physics.SetSpeedY(-physics.gravity / 4, 0);
-                    }
+                    wallJump = 0;
                 }
                 else if (extraJumpsCurrent > 0 && JumpPressed())
                 {
                     extraJumpsCurrent --;
                     physics.SetSpeedY(jumpHeight, 0.15f);
                 }
-				else if(extraJumpsCurrent == 0 && JumpPressed() && inputType == "AI")
-				{
-					//for scoring the AI for mistakes
-					if(ai != null)
-					{
-						ai.score -= 0.25;
-					}
-				}
+                else if (extraJumpsCurrent == 0 && JumpPressed() && inputType == "AI")
+                {
+                    //for scoring the AI for mistakes
+                    if (ai != null)
+                    {
+                        ai.score -= 0.25;
+                    }
+                }
 
                 if (AttackPressed())
                     AttackEffect();
 
                 if (SpecialPressed())
                     SpecialEffect();
-
-                if (Grab1Pressed() || Grab2Pressed())
-                    grab = true;
-
-                if (active1 != null && Item1Pressed() && active1CooldownCurrent <= 0)
+                
+                if (controlScheme == 0)
                 {
-                    active1.Activate(this);
-                    active1CooldownCurrent = active1.cooldown;
+                    if (Grab1Pressed() || Grab2Pressed())
+                        grab = true;
+                    
+                    if (active1 != null && Item1Pressed() && active1CooldownCurrent <= 0)
+                    {
+                        active1.Activate(this);
+                        active1CooldownCurrent = active1.cooldown;
+                    }
+                    
+                    if (active2 != null && Item2Pressed() && active2CooldownCurrent <= 0)
+                    {
+                        active2.Activate(this);
+                        active2CooldownCurrent = active2.cooldown;
+                    }
                 }
-            
-                if (active2 != null && Item2Pressed() && active2CooldownCurrent <= 0)
+                else if (controlScheme == 1)
                 {
-                    active2.Activate(this);
-                    active2CooldownCurrent = active2.cooldown;
+                    if (Grab1Pressed() || Grab2Pressed() || DownPressed())
+                        grab = true;
+                    
+                    if (active1 != null && Item1Pressed() && active1CooldownCurrent <= 0)
+                    {
+                        active1.Activate(this);
+                        active1CooldownCurrent = active1.cooldown;
+                    }
+                    
+                    if (active2 != null && Item2Pressed() && active2CooldownCurrent <= 0)
+                    {
+                        active2.Activate(this);
+                        active2CooldownCurrent = active2.cooldown;
+                    }
+                }
+                else if (controlScheme == 2)
+                {
+                    special = item2;
+                    
+                    if (Grab1Pressed() || DownPressed())
+                        grab = true;
+                    
+                    if (Grab2Pressed())
+                    {
+                        ActiveItem t = active1;
+                        active1 = active2;
+                        active2 = t;
+                    }
+                    
+                    if (active1 != null && Item1Pressed() && active1CooldownCurrent <= 0)
+                    {
+                        active1.Activate(this);
+                        active1CooldownCurrent = active1.cooldown;
+                    }
+                    
                 }
             }
 
@@ -362,24 +477,24 @@ public class PlayerController : MonoBehaviour
 
     protected virtual void AttackEffect ()
     {
-		if(inputType == "AI")
-		{
-			if(ai!=null)
-			{
-				ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
-			}
-		}
+        if (inputType == "AI")
+        {
+            if (ai != null)
+            {
+                ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
+            }
+        }
     }
 
     protected virtual void SpecialEffect ()
     {
-		if(inputType == "AI")
-		{
-			if(ai!=null)
-			{
-				ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
-			}
-		}
+        if (inputType == "AI")
+        {
+            if (ai != null)
+            {
+                ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
+            }
+        }
     }
 
     public virtual void Bounce (GameObject other, Vector2 sp)
@@ -406,19 +521,59 @@ public class PlayerController : MonoBehaviour
 
     public virtual bool Pickup (ActiveItem item)
     {
-        if (Grab1Pressed())
+        if (controlScheme == 0)
+        {
+            if (Grab1Pressed())
+            {
+                if (active1 != null)
+                    Drop(active1);
+                active1 = item;
+                item.OnPickup(this);
+                return true;
+            }
+            else if (Grab2Pressed())
+            {
+                if (active2 != null)
+                    Drop(active2);
+                active2 = item;
+                item.OnPickup(this);
+                return true;
+            }
+        }
+        else if (controlScheme == 1)
+        {
+            if (active1 == null)
+            {
+                active1 = item;
+                item.OnPickup(this);
+                return true;
+            }
+            else if (active2 == null)
+            {
+                active2 = item;
+                item.OnPickup(this);
+                return true;
+            }
+            else if (!pickupToggle)
+            {
+                Drop(active1);
+                active1 = item;
+                item.OnPickup(this);
+                return true;
+            }
+            else
+            {
+                Drop(active2);
+                active2 = item;
+                item.OnPickup(this);
+                return true;
+            }
+        }
+        else if (controlScheme == 2)
         {
             if (active1 != null)
                 Drop(active1);
             active1 = item;
-            item.OnPickup(this);
-            return true;
-        }
-        else if (Grab2Pressed())
-        {
-            if (active2 != null)
-                Drop(active2);
-            active2 = item;
             item.OnPickup(this);
             return true;
         }
@@ -472,14 +627,14 @@ public class PlayerController : MonoBehaviour
         direction = dir * -1;
         animator.hurt = true;
 		
-		//score depending on source if we are an AI
-		if(inputType == "AI")
-		{
-			if(source != this)
-				ai.score += damage*200;
-			else
-				ai.score -= damage*300;
-		}
+        //score depending on source if we are an AI
+        if (inputType == "AI")
+        {
+            if (source != this)
+                ai.score += damage * 200;
+            else
+                ai.score -= damage * 300;
+        }
     }
 
     public virtual void LockInput (float time)

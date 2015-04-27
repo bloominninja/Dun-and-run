@@ -7,7 +7,7 @@ public class MenuCharSelect : MonoBehaviour
     public GameObject[] players;
     public MenuCharSelectWindow[] windows;
 
-	protected bool fillWithBots = true;//default to true for now to test
+    protected bool fillWithBots = true;//default to true for now to test
 
     private int i;
 
@@ -86,6 +86,22 @@ public class MenuCharSelect : MonoBehaviour
                     windows[i].On("Keyboard", "The Destined Hero", "Press X/Escape to quit");
                 }
             }
+            if (Input.GetButtonDown("Xcade1 Confirm"))
+            {
+                if (GameManager.o.FindPlayer("Xcade1") == -1)
+                {
+                    i = GameManager.o.AddPlayer("Xcade1", 6);
+                    windows[i].On("Xcade1", "The Destined Hero", "Press B to quit");
+                }
+            }
+            if (Input.GetButtonDown("Xcade2 Confirm"))
+            {
+                if (GameManager.o.FindPlayer("Xcade2") == -1)
+                {
+                    i = GameManager.o.AddPlayer("Xcade2", 7);
+                    windows[i].On("Xcade 2", "The Destined Hero", "Press B to quit");
+                }
+            }
         }
         else if (Input.GetButtonDown("Menu Cancel"))
         {
@@ -134,51 +150,79 @@ public class MenuCharSelect : MonoBehaviour
                     windows[i].Off();
                 }
             }
+            if (Input.GetButtonDown("Xcade1 Cancel"))
+            {
+                i = GameManager.o.FindPlayer("Xcade1");
+                if (i >= 0)
+                {
+                    GameManager.o.RemovePlayer(i);
+                    windows[i].Off();
+                }
+            }
+            if (Input.GetButtonDown("Xcade2 Cancel"))
+            {
+                i = GameManager.o.FindPlayer("Xcade2");
+                if (i >= 0)
+                {
+                    GameManager.o.RemovePlayer(i);
+                    windows[i].Off();
+                }
+            }
 
         }
         
         if (Input.GetButtonDown("KB Pause") && GameManager.o.FindPlayer("Keyboard") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
-			GameManager.o.fillAI = fillWithBots;
+            GameManager.o.fillAI = fillWithBots;
         }
         else if (Input.GetButtonDown("Joy1 Pause") && GameManager.o.FindPlayer("Joy1") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
-			GameManager.o.fillAI = fillWithBots;
+            GameManager.o.fillAI = fillWithBots;
         }
         else if (Input.GetButtonDown("Joy2 Pause") && GameManager.o.FindPlayer("Joy2") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
-			GameManager.o.fillAI = fillWithBots;
+            GameManager.o.fillAI = fillWithBots;
         }
         else if (Input.GetButtonDown("Joy3 Pause") && GameManager.o.FindPlayer("Joy3") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
-			GameManager.o.fillAI = fillWithBots;
+            GameManager.o.fillAI = fillWithBots;
         }
         else if (Input.GetButtonDown("Joy4 Pause") && GameManager.o.FindPlayer("Joy4") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);
-			GameManager.o.fillAI = fillWithBots;
+            GameManager.o.fillAI = fillWithBots;
+        }
+        else if (Input.GetButtonDown("Xcade1 Pause") && GameManager.o.FindPlayer("Xcade1") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
+        {
+            GameManager.o.ChangeScene(1);
+            GameManager.o.fillAI = fillWithBots;
+        }
+        else if (Input.GetButtonDown("Xcade2 Pause") && GameManager.o.FindPlayer("Xcade2") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
+        {
+            GameManager.o.ChangeScene(1);
+            GameManager.o.fillAI = fillWithBots;
         }
 		//option for if there are no players whatsoever
         else if (Input.GetButtonDown("KB Pause") && fillWithBots)
         {
             GameManager.o.ChangeScene(1);
-			GameManager.o.fillAI = fillWithBots;
+            GameManager.o.fillAI = fillWithBots;
         }
         else if (Input.GetButtonDown("Joy1 Pause") && fillWithBots)
         {
             GameManager.o.ChangeScene(1);
-			GameManager.o.fillAI = fillWithBots;
+            GameManager.o.fillAI = fillWithBots;
         }
-		else if(GameManager.o.aiBroodmother.trainingMode)
-		{
-			//skip everything if the AI is in training mode, so it can loop around infinitely
+        else if (GameManager.o.aiBroodmother.trainingMode)
+        {
+            //skip everything if the AI is in training mode, so it can loop around infinitely
             GameManager.o.ChangeScene(1);
-			GameManager.o.fillAI = fillWithBots;
-		}
+            GameManager.o.fillAI = fillWithBots;
+        }
     }
 }
 

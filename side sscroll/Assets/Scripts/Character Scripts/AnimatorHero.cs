@@ -47,6 +47,10 @@ public class AnimatorHero : CustomAnimator
                         currentAnim = "Attack_1";
                 }
             }
+            else if (specialFire)
+            {
+                currentAnim = "Special_Fire";
+            }
             else if (special)
             {
                 currentAnim = "Special";

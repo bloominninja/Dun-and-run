@@ -3,7 +3,8 @@ using System.Collections;
 
 public class ProjectileHeroArrow : RangedProjectile
 {
-    protected float speed = 15;
+    public float speed = 12.5f;
+    public float dropTime = 0.3f;
 
     private Vector3 t;
     private Quaternion q;
@@ -14,7 +15,7 @@ public class ProjectileHeroArrow : RangedProjectile
         base.Start();
 
         physics.SetSpeedX(speed * direction, 3);
-        physics.SetSpeedY(0, 0.4f);
+        physics.SetSpeedY(0, dropTime);
 
         t = transform.localScale;
         t.x *= direction * Mathf.Sign(transform.localScale.x);

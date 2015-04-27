@@ -10,6 +10,13 @@ public class Item : MonoBehaviour
     public bool held = false;
     protected PlayerController i;
     public bool inChest = false;
+    
+    //unique number to distinguish which item is in use, set by the prefabs
+    //0 is none, and if on an existing item should be treated as an error
+    //1-50 is passive items, 51-100 is active items
+    //1 = ; 2 = ; 3 = ; 4 = ;
+    //51 = red potion; 52 = blue potion; 53 = green potion; 
+    public int id = 0;
 
     // Use this for initialization
     protected virtual void Start ()
