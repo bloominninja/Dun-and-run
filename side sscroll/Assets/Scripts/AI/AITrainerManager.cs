@@ -14,7 +14,7 @@ public class AiTrainerManager
     public AiBase ai3 = null;
     public AiBase ai4 = null;
 	
-    public bool trainingMode = true;
+    public bool trainingMode = false;
     public bool runningMode = false;
     public bool disabled = false;
 	
@@ -543,7 +543,8 @@ public class AiTrainerManager
                 break;
         }
 		
-        playerAI.aiBroodmother = this;
+        if (playerAI != null)
+            playerAI.aiBroodmother = this;
     }
 	
     public void loadNetwork (AiBase ai)

@@ -51,7 +51,11 @@
      <Compile Include="Assets\Scripts\AI\PlayerExternalAI.cs" />
      <Compile Include="Assets\Scripts\ActiveItem.cs" />
      <Compile Include="Assets\Scripts\Character Scripts\AnimatorHero.cs" />
+     <Compile Include="Assets\Scripts\Character Scripts\AnimatorPrincess.cs" />
+     <Compile Include="Assets\Scripts\Character Scripts\AnimatorSoldier.cs" />
      <Compile Include="Assets\Scripts\Character Scripts\ControllerHero.cs" />
+     <Compile Include="Assets\Scripts\Character Scripts\ControllerPrincess.cs" />
+     <Compile Include="Assets\Scripts\Character Scripts\ControllerSoldier.cs" />
      <Compile Include="Assets\Scripts\Chest.cs" />
      <Compile Include="Assets\Scripts\CustomAnimator.cs" />
      <Compile Include="Assets\Scripts\CustomPhysics.cs" />
@@ -75,7 +79,6 @@
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\PlayerPhysics.cs" />
      <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileHeroArrow.cs" />
-     <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileHeroBasic.cs" />
      <Compile Include="Assets\Scripts\Projectile.cs" />
      <Compile Include="Assets\Scripts\ProjectilePhysics.cs" />
      <Compile Include="Assets\Scripts\RangedProjectile.cs" />

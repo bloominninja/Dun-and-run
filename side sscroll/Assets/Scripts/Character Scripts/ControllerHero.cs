@@ -6,7 +6,7 @@ using System.Collections;
 public class ControllerHero : PlayerController
 {
     public ProjectileHeroArrow projArrow;
-    public ProjectileHeroBasic projBasicLeft, projBasicRight;
+    public MeleeProjectile projBasicLeft, projBasicRight;
 
     public bool specialCharge;
     public float specialChargeTime, specialChargeTimeMax = 0.7f;
@@ -17,7 +17,7 @@ public class ControllerHero : PlayerController
         base.Start();
         maxMagic = 8;
         currentMagic = 8;
-        basicCooldown = 0.3f;
+        basicCooldown = 0.5f;
         specialCooldown = 1.8f;
         projBasicLeft.team = team;
         projBasicRight.team = team;
@@ -35,12 +35,12 @@ public class ControllerHero : PlayerController
     {
         if (specialCharge)
         {
+            specialChargeTime += Time.deltaTime;
+            if (specialChargeTime > specialChargeTimeMax)
+                specialChargeTime = specialChargeTimeMax;
             if (Special())
             {
                 LockInput(0);
-                specialChargeTime += Time.deltaTime;
-                if (specialChargeTime > specialChargeTimeMax)
-                    specialChargeTime = specialChargeTimeMax;
             }
             else
             {

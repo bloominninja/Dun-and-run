@@ -4,12 +4,6 @@ using System.Collections;
 public class AnimatorHero : CustomAnimator
 {
     private string currentAnim;
-    // Use this for initialization
-    public override void Start ()
-    {
-        base.Start();
-
-    }
 
     public override void LateUpdate ()
     {

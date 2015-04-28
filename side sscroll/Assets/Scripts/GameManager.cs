@@ -38,15 +38,7 @@ public class GameManager : MonoBehaviour
         aiBroodmother.gameManager = this;
         aiBroodmother.Start();
 
-        /*foreach (PlayerController p in (PlayerController[])FindObjectsOfType(typeof(PlayerController)))
-        {
-            players.Add(p);
-        }
-
-        foreach (Item i in (Item[])FindObjectsOfType(typeof(Item)))
-        {
-            items.Add(i);
-        }*/
+        Time.timeScale = 1;
     }
 	
     public void OnDestroy ()
@@ -147,14 +139,23 @@ public class GameManager : MonoBehaviour
 		
         for (int i = 0; i < 4; i++)
         {
-            if (playerData == null)
+            /*if (playerData == null)
                 continue;
             if (playerData[i] == null)
-                continue;
+                continue;*/
             if (!playerData[i].active)
                 continue;
-			
-            GameObject prefab = Resources.Load<GameObject>("Prefabs/Characters/Player Hero");
+            Debug.Log(playerData[i].character.ToString());
+            string c;
+            if (playerData[i].character == 1)
+                c = "Hero";
+            else if (playerData[i].character == 2)
+                c = "Princess";
+            else if (playerData[i].character == 3)
+                c = "Soldier";
+            else
+                continue;
+            GameObject prefab = Resources.Load<GameObject>("Prefabs/Characters/Player " + c);
             PlayerController p = Instantiate(prefab).GetComponent<PlayerController>();
             players.Add(p);
 			
@@ -168,7 +169,7 @@ public class GameManager : MonoBehaviour
             {
                 aiBroodmother.linkAI(null, i + 1);//this will reset the ai if not in use
             }
-			
+
             p.transform.position = stage.playerSpawns[i].transform.position;
             p.team = playerData[i].team;
             p.inputType = playerData[i].control;
@@ -204,7 +205,7 @@ public class PlayerData
     public bool active = false;
     public string control;
     public int team;
-    //character
+    public int character;
 
     public PlayerData ()
     {
@@ -216,6 +217,7 @@ public class PlayerData
         active = true;
         control = c;
         team = t;
+        character = 1;
     }
 
     public void Deactivate ()
