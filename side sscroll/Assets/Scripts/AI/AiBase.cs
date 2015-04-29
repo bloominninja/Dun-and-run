@@ -105,6 +105,9 @@ public class AiBase : MonoBehaviour
 		//may be useful for stats screen?
 	
 	protected double aiLastDirection = 0;
+	
+	double desiredX = 0;
+	double desiredY = 0;
 
     void Start ()
     {
@@ -122,6 +125,8 @@ public class AiBase : MonoBehaviour
 			//use the outputs of the network
 			readOutputs();
 			
+			makeDecisions();
+			
 			//check if the ai is going the same direction as before
 			if(aiLastDirection == ourPlayer.aiDirection)
 			{
@@ -132,7 +137,7 @@ public class AiBase : MonoBehaviour
 			}
 			else
 			{
-				score+= 1;//small reward for mixing it out
+				score+= 25;//small reward for mixing it out
 				directionCount = 0;
 			}
 			
@@ -443,11 +448,17 @@ public class AiBase : MonoBehaviour
 		
 		currNode = getNode(nodeLayerInput, 7);
 		if(currNode != null)
-			currNode.value = 1;//Item 1 ID, change later
+			if(ourPlayer.active1 != null)
+				currNode.value = ourPlayer.active1.id*10;//Item 1 ID
+			else
+				currNode.value = 0;
 		
 		currNode = getNode(nodeLayerInput, 8);
 		if(currNode != null)
-			currNode.value = 2;//Item 2 ID, change later
+			if(ourPlayer.active2 != null)
+				currNode.value = ourPlayer.active2.id*10;//Item 2 ID
+			else
+				currNode.value = 0;
 		
 		currNode = getNode(nodeLayerInput, 9);
 		if(currNode != null)
@@ -457,22 +468,13 @@ public class AiBase : MonoBehaviour
 		if(currNode != null)
 			currNode.value = ourPlayer.active2CooldownCurrent;//Item 2 CD
 		
-		//attack cooldowns
-		currNode = getNode(nodeLayerInput, 11);
-		if(currNode != null)
-			currNode.value = ourPlayer.basicCooldownCurrent;//attack basic CD
-		
-		currNode = getNode(nodeLayerInput, 12);
-		if(currNode != null)
-			currNode.value = ourPlayer.specialCooldownCurrent;//attack special CD
-		
 		//direction
-		currNode = getNode(nodeLayerInput, 13);
+		currNode = getNode(nodeLayerInput, 11);
 		if(currNode != null)
 			currNode.value = ourPlayer.direction;
 		
 		//invincibility
-		currNode = getNode(nodeLayerInput, 14);
+		currNode = getNode(nodeLayerInput, 12);
 		if(currNode != null)
 		{
 			if(ourPlayer.invincible)
@@ -484,14 +486,22 @@ public class AiBase : MonoBehaviour
 		//passives here
 		
 		//jump cd
-		currNode = getNode(nodeLayerInput, 15);
+		currNode = getNode(nodeLayerInput, 13);
 		if(currNode != null)
 			currNode.value = ourPlayer.extraJumpsCurrent;
 		
 		//rng factor
-		currNode = getNode(nodeLayerInput, 16);
+		currNode = getNode(nodeLayerInput, 14);
 		if(currNode != null)
 			currNode.value = UnityEngine.Random.Range(0, 1.0F);
+		
+		//desired position
+		currNode = getNode(nodeLayerInput, 15);
+		if(currNode != null)
+			currNode.value = desiredX;
+		currNode = getNode(nodeLayerInput, 16);
+		if(currNode != null)
+			currNode.value = desiredY;
 		
 		//grab other opponent data
 		AiBase playerA = null;
@@ -501,66 +511,59 @@ public class AiBase : MonoBehaviour
 		if(aiBroodmother.ai1 != this && aiBroodmother.ai1 != null)
 		{
 			if(playerA == null)
-			{
 				playerA = aiBroodmother.ai1;
-			}
 			else if(playerB == null)
-			{
 				playerB = aiBroodmother.ai1;
-			}
 			else
-			{
 				playerC = aiBroodmother.ai1;
-			}
 		}
 		if(aiBroodmother.ai2 != this && aiBroodmother.ai2 != null)
 		{
 			if(playerA == null)
-			{
 				playerA = aiBroodmother.ai2;
-			}
 			else if(playerB == null)
-			{
 				playerB = aiBroodmother.ai2;
-			}
 			else
-			{
 				playerC = aiBroodmother.ai2;
-			}
 		}
 		if(aiBroodmother.ai3 != this && aiBroodmother.ai3 != null)
 		{
 			if(playerA == null)
-			{
 				playerA = aiBroodmother.ai3;
-			}
 			else if(playerB == null)
-			{
 				playerB = aiBroodmother.ai3;
-			}
 			else
-			{
 				playerC = aiBroodmother.ai3;
-			}
 		}
 		if(aiBroodmother.ai4 != this && aiBroodmother.ai4 != null)
 		{
 			if(playerA == null)
-			{
 				playerA = aiBroodmother.ai4;
-			}
 			else if(playerB == null)
-			{
 				playerB = aiBroodmother.ai4;
-			}
 			else
-			{
 				playerC = aiBroodmother.ai4;
-			}
 		}
 		
 		int multiplayerStart = 17;//for dynamically fitting more inputs later
-		int multiplayerGap = 18;
+		int multiplayerGap = 19;
+		
+		//score for distance from players
+		if(playerA != null && playerA.ourPlayer != null)
+		{
+			score += Math.Pow((36 - (playerA.ourPlayer.transform.position.x - ourPlayer.transform.position.x))/16,2)/2;
+			score += Math.Pow((36 - (playerA.ourPlayer.transform.position.y - ourPlayer.transform.position.y))/4,2)/2;
+		}
+		if(playerB != null && playerB.ourPlayer != null)
+		{
+			score += Math.Pow((36 - (playerB.ourPlayer.transform.position.x - ourPlayer.transform.position.x))/16,2)/2;
+			score += Math.Pow((36 - (playerB.ourPlayer.transform.position.y - ourPlayer.transform.position.y))/4,2)/2;
+		}
+		if(playerC != null && playerC.ourPlayer != null)
+		{
+			score += Math.Pow((36 - (playerC.ourPlayer.transform.position.x - ourPlayer.transform.position.x))/16,2)/2;
+			score += Math.Pow((36 - (playerC.ourPlayer.transform.position.y - ourPlayer.transform.position.y))/4,2)/2;
+		}
 		
 		if(playerA != null && playerA.ourPlayer != null)
 		{
@@ -649,6 +652,11 @@ public class AiBase : MonoBehaviour
 			currNode = getNode(nodeLayerInput, multiplayerStart + 17);
 			if(currNode != null)
 				currNode.value = playerA.ourPlayer.transform.position.y - ourPlayer.transform.position.y;
+			
+			//special charging
+			currNode = getNode(nodeLayerInput, multiplayerStart + 18);
+			if(currNode != null)
+				currNode.value = playerA.ourPlayer.specialChargeTime;
 		}
 		else//default weights if unused
 		{
@@ -704,6 +712,9 @@ public class AiBase : MonoBehaviour
 			if(currNode != null)
 				currNode.value = 0;
 			currNode = getNode(nodeLayerInput, multiplayerStart + 17);
+			if(currNode != null)
+				currNode.value = 0;
+			currNode = getNode(nodeLayerInput, multiplayerStart + 18);
 			if(currNode != null)
 				currNode.value = 0;
 		}
@@ -795,6 +806,11 @@ public class AiBase : MonoBehaviour
 			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 17);
 			if(currNode != null)
 				currNode.value = playerB.ourPlayer.transform.position.y - ourPlayer.transform.position.y;
+			
+			//special charging
+			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 18);
+			if(currNode != null)
+				currNode.value = playerB.ourPlayer.specialChargeTime;
 		}
 		else//default weights if unused
 		{
@@ -850,6 +866,9 @@ public class AiBase : MonoBehaviour
 			if(currNode != null)
 				currNode.value = 0;
 			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 17);
+			if(currNode != null)
+				currNode.value = 0;
+			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 18);
 			if(currNode != null)
 				currNode.value = 0;
 		}
@@ -941,6 +960,11 @@ public class AiBase : MonoBehaviour
 			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 17);
 			if(currNode != null)
 				currNode.value = playerC.ourPlayer.transform.position.y - ourPlayer.transform.position.y;
+			
+			//special charging
+			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 18);
+			if(currNode != null)
+				currNode.value = playerC.ourPlayer.specialChargeTime;
 		}
 		else//default weights if unused
 		{
@@ -998,7 +1022,127 @@ public class AiBase : MonoBehaviour
 			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 17);
 			if(currNode != null)
 				currNode.value = 0;
+			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 18);
+			if(currNode != null)
+				currNode.value = 0;
 		}
+	}
+	
+	void makeDecisions()
+	{
+		if(ourPlayer == null)
+			return;
+		
+		AiBase playerA = null;
+		AiBase playerB = null;
+		AiBase playerC = null;
+		
+		if(aiBroodmother.ai1 != this && aiBroodmother.ai1 != null)
+		{
+			if(playerA == null)
+				playerA = aiBroodmother.ai1;
+			else if(playerB == null)
+				playerB = aiBroodmother.ai1;
+			else
+				playerC = aiBroodmother.ai1;
+		}
+		if(aiBroodmother.ai2 != this && aiBroodmother.ai2 != null)
+		{
+			if(playerA == null)
+				playerA = aiBroodmother.ai2;
+			else if(playerB == null)
+				playerB = aiBroodmother.ai2;
+			else
+				playerC = aiBroodmother.ai2;
+		}
+		if(aiBroodmother.ai3 != this && aiBroodmother.ai3 != null)
+		{
+			if(playerA == null)
+				playerA = aiBroodmother.ai3;
+			else if(playerB == null)
+				playerB = aiBroodmother.ai3;
+			else
+				playerC = aiBroodmother.ai3;
+		}
+		if(aiBroodmother.ai4 != this && aiBroodmother.ai4 != null)
+		{
+			if(playerA == null)
+				playerA = aiBroodmother.ai4;
+			else if(playerB == null)
+				playerB = aiBroodmother.ai4;
+			else
+				playerC = aiBroodmother.ai4;
+		}
+		
+		ourPlayer.aiAttack = false;
+		ourPlayer.aiSpecial = false;
+		
+		//character specific attack protocols
+		if(ourPlayer.id == 1)//hero
+		{
+			//check if enemy is close enough to melee
+			double meleeRadius = 2.0;//adjust
+		
+			if(playerA != null && playerA.ourPlayer != null)
+			{
+				double dist = Math.Pow(playerA.ourPlayer.transform.position.x - ourPlayer.transform.position.x,2) + Math.Pow(playerA.ourPlayer.transform.position.y - ourPlayer.transform.position.y,2);
+				
+				if(dist <= meleeRadius)
+					ourPlayer.aiAttack = true;
+			}
+			if(playerB != null && playerB.ourPlayer != null)
+			{
+				double dist = Math.Pow(playerB.ourPlayer.transform.position.x - ourPlayer.transform.position.x,2) + Math.Pow(playerB.ourPlayer.transform.position.y - ourPlayer.transform.position.y,2);
+				
+				if(dist <= meleeRadius)
+					ourPlayer.aiAttack = true;
+			}
+			if(playerC != null && playerC.ourPlayer != null)
+			{
+				double dist = Math.Pow(playerC.ourPlayer.transform.position.x - ourPlayer.transform.position.x,2) + Math.Pow(playerC.ourPlayer.transform.position.y - ourPlayer.transform.position.y,2);
+				
+				if(dist <= meleeRadius)
+					ourPlayer.aiAttack = true;
+			}
+			
+			//if we didn't use a melee, use a ranged if they're within a distance and range
+			if(!ourPlayer.aiAttack)
+			{
+				double rangedWidth = 6.0;//adjust
+				double rangedHeight = 1.5;//adjust
+				
+				
+				if(playerA != null && playerA.ourPlayer != null)
+				{
+					
+					if(Math.Pow(playerA.ourPlayer.transform.position.x - ourPlayer.transform.position.x,2) <= rangedWidth && Math.Pow(playerA.ourPlayer.transform.position.y - ourPlayer.transform.position.y,2) <= rangedHeight)
+					ourPlayer.aiSpecial = true;
+				}
+				if(playerB != null && playerB.ourPlayer != null)
+				{
+					
+					if(Math.Pow(playerB.ourPlayer.transform.position.x - ourPlayer.transform.position.x,2) <= rangedWidth && Math.Pow(playerB.ourPlayer.transform.position.y - ourPlayer.transform.position.y,2) <= rangedHeight)
+					ourPlayer.aiSpecial = true;
+				}
+				if(playerC != null && playerC.ourPlayer != null)
+				{
+					
+					if(Math.Pow(playerC.ourPlayer.transform.position.x - ourPlayer.transform.position.x,2) <= rangedWidth && Math.Pow(playerC.ourPlayer.transform.position.y - ourPlayer.transform.position.y,2) <= rangedHeight)
+					ourPlayer.aiSpecial = true;
+				}
+				
+				if(ourPlayer.aiSpecial && ourPlayer.specialChargeTime >= ourPlayer.specialChargeTimeMax)
+				{
+					ourPlayer.aiSpecial = false;
+				}
+			}
+			
+		}
+		
+		if(ourPlayer.active1 == null)
+			ourPlayer.aiPickup1 = true;
+		else if(ourPlayer.active2 == null)
+			ourPlayer.aiPickup2 = true;
 	}
 	
 	void readOutputs()
@@ -1007,16 +1151,23 @@ public class AiBase : MonoBehaviour
 			return;//don't run without a player
 		
 		Node currNode = null;
+		Node currNode2 = null;
 		
 		//move left or right
-		currNode = getNode(nodeLayerOutput, 0);
-		if(currNode != null)
+		currNode = getNode(nodeLayerOutput, 6);
+		currNode2 = getNode(nodeLayerOutput, 1);
+		if(currNode != null && currNode2 != null)
 		{
-			ourPlayer.aiDirection = currNode.value-0.25;
+			if(currNode.value > currNode2.value)
+				ourPlayer.aiDirection = 0;
+			else if(currNode.value < currNode2.value)
+				ourPlayer.aiDirection = 1;
+			else
+				ourPlayer.aiDirection = 0.5;
 		}
 		
 		//get our jump
-		currNode = getNode(nodeLayerOutput, 1);
+		currNode = getNode(nodeLayerOutput, 2);
 		if(currNode != null)
 		{
 			if(currNode.value > 0.5)
@@ -1030,59 +1181,8 @@ public class AiBase : MonoBehaviour
 			}
 		}
 		
-		//attacking
-		currNode = getNode(nodeLayerOutput, 2);
-		if(currNode != null)
-		{
-			if(currNode.value > 0.5)
-			{
-				ourPlayer.aiAttack = true;
-				if(ourPlayer.basicCooldownCurrent > 0)
-					score-=0.2;//don't attack while on cooldown!
-				else
-					score+=0.1;//give reward for attacking
-			}
-			else
-			{
-				ourPlayer.aiAttack = false;
-			}
-		}
-		
-		//special attacking
-		currNode = getNode(nodeLayerOutput, 3);
-		if(currNode != null)
-		{
-			if(currNode.value > 0.5)
-			{
-				ourPlayer.aiSpecial = true;
-				if(ourPlayer.specialCooldownCurrent > 0)
-					score-=0.4;//don't attack while on cooldown!
-				else
-					score+=0.2;//give reward for attacking
-			}
-			else
-			{
-				ourPlayer.aiSpecial = false;
-			}
-		}
-		
-		//idle
-		currNode = getNode(nodeLayerOutput, 4);
-		if(currNode != null)
-		{
-			if(currNode.value > 0.5)
-			{
-				ourPlayer.aiIdle = true;
-			}
-			else
-			{
-				ourPlayer.aiIdle = false;
-				score+=0.4;//give reward for not sitting there
-			}
-		}
-		
 		//items
-		currNode = getNode(nodeLayerOutput, 5);
+		currNode = getNode(nodeLayerOutput, 3);
 		if(currNode != null)
 		{
 			if(currNode.value > 0.5)
@@ -1099,7 +1199,7 @@ public class AiBase : MonoBehaviour
 				score+=0.1;//give reward for saving items
 			}
 		}
-		currNode = getNode(nodeLayerOutput, 6);
+		currNode = getNode(nodeLayerOutput, 4);
 		if(currNode != null)
 		{
 			if(currNode.value > 0.5)
@@ -1114,34 +1214,6 @@ public class AiBase : MonoBehaviour
 			{
 				ourPlayer.aiItem2 = false;
 				score+=0.1;//give reward for saving items
-			}
-		}
-		
-		//pickup items
-		currNode = getNode(nodeLayerOutput, 7);
-		if(currNode != null)
-		{
-			if(currNode.value > 0.5)
-			{
-				ourPlayer.aiPickup1 = true;
-				score+=0.15;//give reward for grabbing items
-			}
-			else
-			{
-				ourPlayer.aiPickup1 = false;
-			}
-		}
-		currNode = getNode(nodeLayerOutput, 8);
-		if(currNode != null)
-		{
-			if(currNode.value > 0.5)
-			{
-				ourPlayer.aiPickup2 = true;
-				score+=0.15;//give reward for grabbing items
-			}
-			else
-			{
-				ourPlayer.aiPickup2 = false;
 			}
 		}
 	}

@@ -9,7 +9,6 @@ public class ControllerHero : PlayerController
     public ProjectileHeroBasic projBasicLeft, projBasicRight;
 
     public bool specialCharge;
-    public float specialChargeTime, specialChargeTimeMax = 0.7f;
 
     // Use this for initialization
     protected override void Start ()
@@ -22,6 +21,7 @@ public class ControllerHero : PlayerController
         projBasicLeft.team = team;
         projBasicRight.team = team;
         projBasicLeft.direction = -1;
+		specialChargeTimeMax = 0.7f;
     }
 	
     // Update is called once per frame
