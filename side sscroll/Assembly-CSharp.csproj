@@ -39,10 +39,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>L:/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>L:/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -51,7 +51,11 @@
      <Compile Include="Assets\Scripts\AI\PlayerExternalAI.cs" />
      <Compile Include="Assets\Scripts\ActiveItem.cs" />
      <Compile Include="Assets\Scripts\Character Scripts\AnimatorHero.cs" />
+     <Compile Include="Assets\Scripts\Character Scripts\AnimatorPrincess.cs" />
+     <Compile Include="Assets\Scripts\Character Scripts\AnimatorSoldier.cs" />
      <Compile Include="Assets\Scripts\Character Scripts\ControllerHero.cs" />
+     <Compile Include="Assets\Scripts\Character Scripts\ControllerPrincess.cs" />
+     <Compile Include="Assets\Scripts\Character Scripts\ControllerSoldier.cs" />
      <Compile Include="Assets\Scripts\Chest.cs" />
      <Compile Include="Assets\Scripts\CustomAnimator.cs" />
      <Compile Include="Assets\Scripts\CustomPhysics.cs" />
@@ -75,13 +79,12 @@
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\PlayerPhysics.cs" />
      <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileHeroArrow.cs" />
-     <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileHeroBasic.cs" />
      <Compile Include="Assets\Scripts\Projectile.cs" />
      <Compile Include="Assets\Scripts\ProjectilePhysics.cs" />
      <Compile Include="Assets\Scripts\RangedProjectile.cs" />
      <Compile Include="Assets\Scripts\Stage.cs" />
  <Reference Include="UnityEngine.UI">
- <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ <HintPath>L:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

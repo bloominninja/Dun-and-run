@@ -46,7 +46,7 @@ public class ProjectileHeroArrow : RangedProjectile
 
     public override void Effect (PlayerController player)
     {
-        player.Damage(1, direction, getSource());
+        base.Effect(player);
         Destroy(this.gameObject);
     }
 }
