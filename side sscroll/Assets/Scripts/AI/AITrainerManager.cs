@@ -14,9 +14,15 @@ public class AiTrainerManager
 	public AiBase ai3 = null;
 	public AiBase ai4 = null;
 	
+<<<<<<< HEAD
 	public bool trainingMode = true;
 	public bool runningMode = false;
 	public bool disabled = false;
+=======
+    public bool trainingMode = false;
+    public bool runningMode = false;
+    public bool disabled = false;
+>>>>>>> e90840fecd0418145cc426cec828d010bd8630fb
 	
 	bool started = false;
 	
@@ -548,6 +554,9 @@ public class AiTrainerManager
 		
 		playerAI.aiBroodmother = this;
 	}
+	
+	if (playerAI != null)
+		playerAI.aiBroodmother = this;
 	
 	public void loadNetwork(AiBase ai)
 	{

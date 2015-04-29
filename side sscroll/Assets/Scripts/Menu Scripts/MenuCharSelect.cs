@@ -7,7 +7,7 @@ public class MenuCharSelect : MonoBehaviour
     public GameObject[] players;
     public MenuCharSelectWindow[] windows;
 
-    protected bool fillWithBots = true;//default to true for now to test
+    protected bool fillWithBots = false;//default to true for now to test
 
     private int i;
 
@@ -171,6 +171,135 @@ public class MenuCharSelect : MonoBehaviour
 
         }
         
+        if (Input.GetButtonDown("Joy1 Grab1"))
+        {
+            i = GameManager.o.FindPlayer("Joy1");
+            if (i >= 0)
+            {
+                Debug.Log(i.ToString());
+                GameManager.o.playerData[i].character = 2;
+                windows[i].textCharacter.text = "Adventuring Princess";
+            }
+        }
+        if (Input.GetButtonDown("Joy2 Grab1"))
+        {
+            i = GameManager.o.FindPlayer("Joy2");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 2;
+                windows[i].textCharacter.text = "Adventuring Princess";
+            }
+        }
+        if (Input.GetButtonDown("Joy3 Grab1"))
+        {
+            i = GameManager.o.FindPlayer("Joy3");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 2;
+                windows[i].textCharacter.text = "Adventuring Princess";
+            }
+        }
+        if (Input.GetButtonDown("Joy4 Grab1"))
+        {
+            i = GameManager.o.FindPlayer("Joy4");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 2;
+                windows[i].textCharacter.text = "Adventuring Princess";
+            }
+        }
+        if (Input.GetButtonDown("KB Grab1"))
+        {
+            i = GameManager.o.FindPlayer("Keyboard");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 2;
+                windows[i].textCharacter.text = "Adventuring Princess";
+            }
+        }
+        if (Input.GetButtonDown("Xcade1 Grab1"))
+        {
+            i = GameManager.o.FindPlayer("Xcade1");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 2;
+                windows[i].textCharacter.text = "Adventuring Princess";
+            }
+        }
+        if (Input.GetButtonDown("Xcade2 Grab1"))
+        {
+            i = GameManager.o.FindPlayer("Xcade2");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 2;
+                windows[i].textCharacter.text = "Adventuring Princess";
+            }
+        }
+        
+        if (Input.GetButtonDown("Joy1 Grab2"))
+        {
+            i = GameManager.o.FindPlayer("Joy1");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 3;
+                windows[i].textCharacter.text = "Wandering Soldier";
+            }
+        }
+        if (Input.GetButtonDown("Joy2 Grab2"))
+        {
+            i = GameManager.o.FindPlayer("Joy2");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 3;
+                windows[i].textCharacter.text = "Wandering Soldier";
+            }
+        }
+        if (Input.GetButtonDown("Joy3 Grab2"))
+        {
+            i = GameManager.o.FindPlayer("Joy3");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 3;
+                windows[i].textCharacter.text = "Wandering Soldier";
+            }
+        }
+        if (Input.GetButtonDown("Joy4 Grab2"))
+        {
+            i = GameManager.o.FindPlayer("Joy4");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 3;
+                windows[i].textCharacter.text = "Wandering Soldier";
+            }
+        }
+        if (Input.GetButtonDown("KB Grab2"))
+        {
+            i = GameManager.o.FindPlayer("Keyboard");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 3;
+                windows[i].textCharacter.text = "Wandering Soldier";
+            }
+        }
+        if (Input.GetButtonDown("Xcade1 Grab2"))
+        {
+            i = GameManager.o.FindPlayer("Xcade1");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 3;
+                windows[i].textCharacter.text = "Wandering Soldier";
+            }
+        }
+        if (Input.GetButtonDown("Xcade2 Grab1"))
+        {
+            i = GameManager.o.FindPlayer("Xcade2");
+            if (i >= 0)
+            {
+                GameManager.o.playerData[i].character = 3;
+                windows[i].textCharacter.text = "Wandering Soldier";
+            }
+        }
+
         if (Input.GetButtonDown("KB Pause") && GameManager.o.FindPlayer("Keyboard") >= 0 && (GameManager.o.numPlayers >= 2 || fillWithBots))
         {
             GameManager.o.ChangeScene(1);

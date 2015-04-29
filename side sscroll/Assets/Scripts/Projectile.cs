@@ -9,6 +9,7 @@ public class Projectile : MonoBehaviour
     public int direction = 1;
     public float life = 0;
     protected PlayerController i;
+    public int damage = 1;
     
     // Use this for initialization
     protected virtual void Start ()
@@ -39,12 +40,12 @@ public class Projectile : MonoBehaviour
     
     public virtual void Effect (PlayerController player)
     {
-        Destroy(this.gameObject);
+        player.Damage(damage, direction, getSource());
     }
 	
-	public PlayerController getSource()
-	{
-		return i;
-	}
+    public PlayerController getSource ()
+    {
+        return i;
+    }
 
 }

@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AnimatorHero : CustomAnimator
+public class AnimatorPrincess : CustomAnimator
 {
     private string currentAnim;
-
+    
     public override void LateUpdate ()
     {
         base.LateUpdate();
@@ -15,7 +15,7 @@ public class AnimatorHero : CustomAnimator
                 if (currentAnim != "Defeated")
                 {
                     if (!physics.collideBottom)
-                        currentAnim = "Hurt_2";
+                        currentAnim = "Hurt_Air";
                     else
                         currentAnim = "Defeated";
                 }
@@ -23,40 +23,40 @@ public class AnimatorHero : CustomAnimator
             }
             else if (hurt)
             {
-                if (currentAnim != "Hurt_2" && currentAnim != "Hurt_1")
+                if (currentAnim != "Hurt_Air" && currentAnim != "Hurt_Ground")
                 {
                     if (!physics.collideBottom)
-                        currentAnim = "Hurt_1";
+                        currentAnim = "Hurt_Ground";
                     else
-                        currentAnim = "Hurt_2";
+                        currentAnim = "Hurt_Air";
                 }
             }
             else if (attacking)
             {
-                if (currentAnim != "Attack_2" && currentAnim != "Attack_1")
+                if (currentAnim != "Attack_Air" && currentAnim != "Attack_Ground")
                 {
                     if (!physics.collideBottom)
-                        currentAnim = "Attack_2";
+                        currentAnim = "Attack_Air";
                     else
-                        currentAnim = "Attack_1";
+                        currentAnim = "Attack_Ground";
                 }
             }
             else if (specialFire)
             {
-                currentAnim = "Special_Fire";
+                //currentAnim = "Special_Fire";
             }
             else if (special)
             {
-                currentAnim = "Special";
+                //currentAnim = "Special";
             }
             else if (!physics.collideBottom)
             {
                 if (physics.speed.y > 2)
-                    currentAnim = "Jump_up";
+                    currentAnim = "Jump_Up";
                 else if (physics.speed.y < -2)
-                    currentAnim = "Jump_down";
+                    currentAnim = "Jump_Down";
                 else
-                    currentAnim = "Jump_neutral";
+                    currentAnim = "Jump_Neutral";
             }
             else if (physics.speed.x != 0)
             {
