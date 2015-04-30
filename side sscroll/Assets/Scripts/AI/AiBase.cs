@@ -93,6 +93,8 @@ public class AiBase : MonoBehaviour
 	Node nodeLayerOutput = null;
 	int outputLayerCount = 0;
 	
+	int ticksToDestination = 0;
+	
 	int directionCount = 0;
 	
 	public AiTrainerManager aiBroodmother = null;
@@ -261,6 +263,42 @@ public class AiBase : MonoBehaviour
 		}
 	}
 	
+	//calculate what risk this target AI is
+	double rateDanger(AiBase target)
+	{
+		if(target == null)
+			return 0;//can't gauge a non-existent target
+		
+		double total = 300;//start it out here
+		
+		if(target.ourPlayer != null && ourPlayer != null)
+		{
+			
+			//add potency if two items
+			if(target.ourPlayer.active1 != null)
+				total += 100;
+			if(target.ourPlayer.active2 != null)
+				total += 100;
+			
+			//add proximity value, small
+			total += Math.Abs(36 - (target.ourPlayer.transform.position.x - ourPlayer.transform.position.x));
+			total += Math.Abs(24 - (target.ourPlayer.transform.position.y - ourPlayer.transform.position.y))/2;
+		
+			total *= Math.Pow(10 * target.ourPlayer.currentHealth / target.ourPlayer.maxHealth,2);//multiply it by their current health, squared
+			total *= 1 + (target.ourPlayer.currentMagic / target.ourPlayer.maxMagic);//factor in mana
+			
+			//check for invincibility
+			if(target.ourPlayer.invincible)
+				total = 999999;
+			
+			//check us for invincibility
+			if(ourPlayer.invincible)
+				total = 0;
+		}
+		
+		return total;
+	}
+	
 	void destroyNetwork()
 	{
 		if(nodeLayerInput == null || nodeLayer1 == null | nodeLayer2 == null | nodeLayerOutput == null)
@@ -417,97 +455,10 @@ public class AiBase : MonoBehaviour
 		//later (low priority)
 			//passive ids
 		
-		//get our x and y
-		currNode = getNode(nodeLayerInput, 0);
-		if(currNode != null)
-			currNode.value = ourPlayer.transform.position.x;
-		
-		currNode = getNode(nodeLayerInput, 1);
-		if(currNode != null)
-			currNode.value = ourPlayer.transform.position.y;
-		
-		currNode = getNode(nodeLayerInput, 2);
-		if(currNode != null)
-			currNode.value = ourPlayer.currentHealth;
-		
-		currNode = getNode(nodeLayerInput, 3);
-		if(currNode != null)
-			currNode.value = ourPlayer.maxHealth;
-		
-		currNode = getNode(nodeLayerInput, 4);
-		if(currNode != null)
-			currNode.value = ourPlayer.currentMagic;
-		
-		currNode = getNode(nodeLayerInput, 5);
-		if(currNode != null)
-			currNode.value = ourPlayer.maxMagic;
-		
-		currNode = getNode(nodeLayerInput, 6);
-		if(currNode != null)
-			currNode.value = 1;//character ID, change later
-		
-		currNode = getNode(nodeLayerInput, 7);
-		if(currNode != null)
-			if(ourPlayer.active1 != null)
-				currNode.value = ourPlayer.active1.id*10;//Item 1 ID
-			else
-				currNode.value = 0;
-		
-		currNode = getNode(nodeLayerInput, 8);
-		if(currNode != null)
-			if(ourPlayer.active2 != null)
-				currNode.value = ourPlayer.active2.id*10;//Item 2 ID
-			else
-				currNode.value = 0;
-		
-		currNode = getNode(nodeLayerInput, 9);
-		if(currNode != null)
-			currNode.value = ourPlayer.active1CooldownCurrent;//Item 1 CD
-		
-		currNode = getNode(nodeLayerInput, 10);
-		if(currNode != null)
-			currNode.value = ourPlayer.active2CooldownCurrent;//Item 2 CD
-		
-		//direction
-		currNode = getNode(nodeLayerInput, 11);
-		if(currNode != null)
-			currNode.value = ourPlayer.direction;
-		
-		//invincibility
-		currNode = getNode(nodeLayerInput, 12);
-		if(currNode != null)
-		{
-			if(ourPlayer.invincible)
-				currNode.value =0;
-			else
-				currNode.value = 5;
-		}
-		
-		//passives here
-		
-		//jump cd
-		currNode = getNode(nodeLayerInput, 13);
-		if(currNode != null)
-			currNode.value = ourPlayer.extraJumpsCurrent;
-		
-		//rng factor
-		currNode = getNode(nodeLayerInput, 14);
-		if(currNode != null)
-			currNode.value = UnityEngine.Random.Range(0, 1.0F);
-		
-		//desired position
-		currNode = getNode(nodeLayerInput, 15);
-		if(currNode != null)
-			currNode.value = desiredX;
-		currNode = getNode(nodeLayerInput, 16);
-		if(currNode != null)
-			currNode.value = desiredY;
-		
 		//grab other opponent data
 		AiBase playerA = null;
 		AiBase playerB = null;
 		AiBase playerC = null;
-		
 		if(aiBroodmother.ai1 != this && aiBroodmother.ai1 != null)
 		{
 			if(playerA == null)
@@ -545,487 +496,84 @@ public class AiBase : MonoBehaviour
 				playerC = aiBroodmother.ai4;
 		}
 		
-		int multiplayerStart = 17;//for dynamically fitting more inputs later
-		int multiplayerGap = 19;
+		//get our x and y
+		currNode = getNode(nodeLayerInput, 0);
+		if(currNode != null)
+			currNode.value = ourPlayer.transform.position.x;
 		
-		//score for distance from players
-		if(playerA != null && playerA.ourPlayer != null)
-		{
-			score += Math.Pow((36 - (playerA.ourPlayer.transform.position.x - ourPlayer.transform.position.x))/16,2)/2;
-			score += Math.Pow((36 - (playerA.ourPlayer.transform.position.y - ourPlayer.transform.position.y))/4,2)/2;
-		}
-		if(playerB != null && playerB.ourPlayer != null)
-		{
-			score += Math.Pow((36 - (playerB.ourPlayer.transform.position.x - ourPlayer.transform.position.x))/16,2)/2;
-			score += Math.Pow((36 - (playerB.ourPlayer.transform.position.y - ourPlayer.transform.position.y))/4,2)/2;
-		}
-		if(playerC != null && playerC.ourPlayer != null)
-		{
-			score += Math.Pow((36 - (playerC.ourPlayer.transform.position.x - ourPlayer.transform.position.x))/16,2)/2;
-			score += Math.Pow((36 - (playerC.ourPlayer.transform.position.y - ourPlayer.transform.position.y))/4,2)/2;
-		}
+		currNode = getNode(nodeLayerInput, 1);
+		if(currNode != null)
+			currNode.value = ourPlayer.transform.position.y;
 		
-		if(playerA != null && playerA.ourPlayer != null)
-		{
-			//get x and y
-			currNode = getNode(nodeLayerInput, multiplayerStart + 0);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.transform.position.x;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 1);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.transform.position.y;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 2);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.currentHealth;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 3);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.maxHealth;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 4);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.currentMagic;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 5);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.maxMagic;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 6);
-			if(currNode != null)
-				currNode.value = 1;//character ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 7);
-			if(currNode != null)
-				currNode.value = 1;//Item 1 ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 8);
-			if(currNode != null)
-				currNode.value = 2;//Item 2 ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 9);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.active1CooldownCurrent;//Item 1 CD
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 10);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.active2CooldownCurrent;//Item 2 CD
-			
-			//attack cooldowns
-			currNode = getNode(nodeLayerInput, multiplayerStart + 11);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.basicCooldownCurrent;//attack basic CD
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + 12);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.specialCooldownCurrent;//attack special CD
-			
-			//direction
-			currNode = getNode(nodeLayerInput, multiplayerStart + 13);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.direction;
-			
-			//invincibility
-			currNode = getNode(nodeLayerInput, multiplayerStart + 14);
-			if(currNode != null)
-			{
-				if(playerA.ourPlayer.invincible)
-					currNode.value =0;
-				else
-					currNode.value = 5;
-			}
-			
-			//passives here
-			
-			//jump cd
-			currNode = getNode(nodeLayerInput, multiplayerStart + 15);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.extraJumpsCurrent;
-			
-			//distance from us
-			currNode = getNode(nodeLayerInput, multiplayerStart + 16);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.transform.position.x - ourPlayer.transform.position.x;
-			
-			//distance from us
-			currNode = getNode(nodeLayerInput, multiplayerStart + 17);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.transform.position.y - ourPlayer.transform.position.y;
-			
-			//special charging
-			currNode = getNode(nodeLayerInput, multiplayerStart + 18);
-			if(currNode != null)
-				currNode.value = playerA.ourPlayer.specialChargeTime;
-		}
-		else//default weights if unused
-		{
-			currNode = getNode(nodeLayerInput, multiplayerStart + 0);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 1);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 2);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 3);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 4);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 5);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 6);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 7);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 8);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 9);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 10);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 11);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 12);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 13);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 14);
-			if(currNode != null)
-				currNode.value =0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 15);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 16);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 17);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + 18);
-			if(currNode != null)
-				currNode.value = 0;
-		}
+		currNode = getNode(nodeLayerInput, 2);
+		if(currNode != null)
+			currNode.value = rateDanger(playerA);
 		
-		if(playerB != null && playerB.ourPlayer != null)
-		{
-			//get x and y
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 0);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.transform.position.x;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 1);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.transform.position.y;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 2);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.currentHealth;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 3);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.maxHealth;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 4);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.currentMagic;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 5);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.maxMagic;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 6);
-			if(currNode != null)
-				currNode.value = 1;//character ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 7);
-			if(currNode != null)
-				currNode.value = 1;//Item 1 ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 8);
-			if(currNode != null)
-				currNode.value = 2;//Item 2 ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 9);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.active1CooldownCurrent;//Item 1 CD
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 10);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.active2CooldownCurrent;//Item 2 CD
-			
-			//attack cooldowns
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 11);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.basicCooldownCurrent;//attack basic CD
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 12);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.specialCooldownCurrent;//attack special CD
-			
-			//direction
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 13);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.direction;
-			
-			//invincibility
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 14);
-			if(currNode != null)
-			{
-				if(playerB.ourPlayer.invincible)
-					currNode.value =0;
-				else
-					currNode.value = 5;
-			}
-			
-			//passives here
-			
-			//jump cd
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 15);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.extraJumpsCurrent;
-			
-			//distance from us
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 16);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.transform.position.x - ourPlayer.transform.position.x;
-			
-			//distance from us
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 17);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.transform.position.y - ourPlayer.transform.position.y;
-			
-			//special charging
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 18);
-			if(currNode != null)
-				currNode.value = playerB.ourPlayer.specialChargeTime;
-		}
-		else//default weights if unused
-		{
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 0);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 1);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 2);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 3);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 4);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 5);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 6);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 7);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 8);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 9);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 10);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 11);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 12);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 13);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 14);
-			if(currNode != null)
-				currNode.value =0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 15);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 16);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 17);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap + 18);
-			if(currNode != null)
-				currNode.value = 0;
-		}
+		currNode = getNode(nodeLayerInput, 3);
+		if(currNode != null)
+			currNode.value = rateDanger(playerB);
 		
-		if(playerC != null && playerC.ourPlayer != null)
-		{
-			//get x and y
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 0);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.transform.position.x;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 1);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.transform.position.y;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 2);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.currentHealth;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 3);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.maxHealth;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 4);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.currentMagic;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 5);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.maxMagic;
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 6);
-			if(currNode != null)
-				currNode.value = 1;//character ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 7);
-			if(currNode != null)
-				currNode.value = 1;//Item 1 ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 8);
-			if(currNode != null)
-				currNode.value = 2;//Item 2 ID, change later
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 9);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.active1CooldownCurrent;//Item 1 CD
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 10);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.active2CooldownCurrent;//Item 2 CD
-			
-			//attack cooldowns
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 11);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.basicCooldownCurrent;//attack basic CD
-			
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 12);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.specialCooldownCurrent;//attack special CD
-			
-			//direction
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 13);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.direction;
-			
-			//invincibility
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 14);
-			if(currNode != null)
-			{
-				if(playerC.ourPlayer.invincible)
-					currNode.value =0;
-				else
-					currNode.value = 5;
-			}
-			
-			//passives here
-			
-			//jump cd
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 15);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.extraJumpsCurrent;
-			
-			//distance from us
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 16);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.transform.position.x - ourPlayer.transform.position.x;
-			
-			//distance from us
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 17);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.transform.position.y - ourPlayer.transform.position.y;
-			
-			//special charging
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 18);
-			if(currNode != null)
-				currNode.value = playerC.ourPlayer.specialChargeTime;
-		}
-		else//default weights if unused
-		{
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 0);
-			if(currNode != null)
+		currNode = getNode(nodeLayerInput, 4);
+		if(currNode != null)
+			currNode.value = rateDanger(playerC);
+		
+		currNode = getNode(nodeLayerInput, 5);
+		if(currNode != null)
+			currNode.value = 1;//character ID, change later
+		
+		currNode = getNode(nodeLayerInput, 6);
+		if(currNode != null)
+			if(ourPlayer.active1 != null)
+				currNode.value = ourPlayer.active1.id*10;//Item 1 ID
+			else
 				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 1);
-			if(currNode != null)
+		
+		currNode = getNode(nodeLayerInput, 7);
+		if(currNode != null)
+			if(ourPlayer.active2 != null)
+				currNode.value = ourPlayer.active2.id*10;//Item 2 ID
+			else
 				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 2);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 3);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 4);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 5);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 6);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 7);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 8);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 9);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 10);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 11);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 12);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 13);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 14);
-			if(currNode != null)
-				currNode.value =0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 15);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 16);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 17);
-			if(currNode != null)
-				currNode.value = 0;
-			currNode = getNode(nodeLayerInput, multiplayerStart + multiplayerGap*2 + 18);
-			if(currNode != null)
-				currNode.value = 0;
-		}
+		
+		currNode = getNode(nodeLayerInput, 8);
+		if(currNode != null)
+			currNode.value = ourPlayer.active1CooldownCurrent;//Item 1 CD
+		
+		currNode = getNode(nodeLayerInput, 9);
+		if(currNode != null)
+			currNode.value = ourPlayer.active2CooldownCurrent;//Item 2 CD
+		
+		//direction
+		currNode = getNode(nodeLayerInput, 10);
+		if(currNode != null)
+			currNode.value = ourPlayer.direction;
+		
+		//passives here
+		
+		//jump cd
+		currNode = getNode(nodeLayerInput, 11);
+		if(currNode != null)
+			currNode.value = ourPlayer.extraJumpsCurrent;
+		
+		//desired position
+		currNode = getNode(nodeLayerInput, 12);
+		if(currNode != null)
+			currNode.value = desiredX;
+		currNode = getNode(nodeLayerInput, 13);
+		if(currNode != null)
+			currNode.value = desiredY;
+		
+		//score for distance from target
+		
+		if(Math.Abs(desiredX - ourPlayer.transform.position.x) + Math.Abs(desiredY - ourPlayer.transform.position.y) > 2)
+			ticksToDestination++;
+		else
+			ticksToDestination = 0;
+		
+		double scale = 5 - ticksToDestination/20;
+		
+		score += scale*Math.Pow((36 - (desiredX - ourPlayer.transform.position.x))/16,2)/2;
+		score += scale*Math.Pow((24 - (desiredY - ourPlayer.transform.position.y))/4,2)/2;
 	}
 	
 	void makeDecisions()
@@ -1138,6 +686,125 @@ public class AiBase : MonoBehaviour
 			}
 			
 		}
+		
+		//determine where we want to go
+		//find highest danger rating
+		double ourRating = rateDanger(this);
+		
+		AiBase highestDanger = this;
+		double highestDangerRating = ourRating;
+		
+		//find lowest danger rating
+		AiBase lowestDanger = this;
+		double lowestDangerRating = ourRating;
+		
+		//now check all other players to see whom the highest and lowest is
+		double tempRating = ourRating;
+		
+		int living = 1;
+		
+		if(playerA != null)
+		{
+			tempRating = rateDanger(playerA);
+			
+			if(tempRating > highestDangerRating)
+			{
+				highestDanger = playerA;
+				highestDangerRating = tempRating;
+			}
+			else if(tempRating < lowestDangerRating)
+			{
+				lowestDanger = playerA;
+				lowestDangerRating = tempRating;
+			}
+			//default to first AI found to be strongest
+			else
+			{
+				highestDanger = playerA;
+				highestDangerRating = tempRating;
+			}
+			
+			if(playerA.ourPlayer != null)
+				if(playerA.ourPlayer.currentHealth > 0)
+					living++;
+		}
+		if(playerB != null)
+		{
+			tempRating = rateDanger(playerB);
+			
+			if(tempRating > highestDangerRating)
+			{
+				highestDanger = playerB;
+				highestDangerRating = tempRating;
+			}
+			else if(tempRating < lowestDangerRating)
+			{
+				lowestDanger = playerB;
+				lowestDangerRating = tempRating;
+			}
+			
+			if(playerB.ourPlayer != null)
+				if(playerB.ourPlayer.currentHealth > 0)
+					living++;
+		}
+		if(playerC != null)
+		{
+			tempRating = rateDanger(playerC);
+			
+			if(tempRating > highestDangerRating)
+			{
+				highestDanger = playerC;
+				highestDangerRating = tempRating;
+			}
+			else if(tempRating < lowestDangerRating)
+			{
+				lowestDanger = playerC;
+				lowestDangerRating = tempRating;
+			}
+			//default to last AI found to be weakest
+			else
+			{
+				lowestDanger = playerC;
+				lowestDangerRating = tempRating;
+			}
+			
+			if(playerC.ourPlayer != null)
+				if(playerC.ourPlayer.currentHealth > 0)
+					living++;
+		}
+		
+		double oldDesiredX = desiredX;
+		double oldDesiredY = desiredY;
+		
+		if(lowestDanger.ourPlayer != null && highestDanger.ourPlayer != null)
+		{
+			//now check if the we are not the weakest for aggressive behavior
+			if(ourRating  >= highestDangerRating / 2 || lowestDanger != this)
+			{
+				//pick on the weakest
+				desiredX = lowestDanger.ourPlayer.transform.position.x;
+				desiredY = lowestDanger.ourPlayer.transform.position.y;
+			}
+			//if just us, fite em
+			else if(living == 2)
+			{
+				//believe in me who believes in you (ur gona get rekt son)
+				desiredX = highestDanger.ourPlayer.transform.position.x;
+				desiredY = highestDanger.ourPlayer.transform.position.y;
+			}
+			//now check if the we are the lowest for evasive behavior, try to be at the opposite position of our aggressor
+			else if(lowestDanger == this)
+			{
+				//evasive maneuver alpha gamma
+				desiredX = 36 - highestDanger.ourPlayer.transform.position.x;
+				desiredY = 24 - highestDanger.ourPlayer.transform.position.y;
+			}
+		}
+				
+		//reset timer if far enough of a new desired position
+		if(Math.Pow(oldDesiredX - desiredX,2) + Math.Pow(oldDesiredY - desiredY,2) > 2)
+			ticksToDestination=0;
+		
 		
 		if(ourPlayer.active1 == null)
 			ourPlayer.aiPickup1 = true;

@@ -37,8 +37,6 @@ public class GameManager : MonoBehaviour
 		
         aiBroodmother.gameManager = this;
         aiBroodmother.Start();
-
-        Time.timeScale = 1;
     }
 	
     public void OnDestroy ()
@@ -147,6 +145,7 @@ public class GameManager : MonoBehaviour
                 continue;
             Debug.Log(playerData[i].character.ToString());
             string c;
+			
             if (playerData[i].character == 1)
                 c = "Hero";
             else if (playerData[i].character == 2)
@@ -155,9 +154,13 @@ public class GameManager : MonoBehaviour
                 c = "Soldier";
             else
                 continue;
+			
             GameObject prefab = Resources.Load<GameObject>("Prefabs/Characters/Player " + c);
             PlayerController p = Instantiate(prefab).GetComponent<PlayerController>();
             players.Add(p);
+			
+			//given overhead displays their number
+			players[i].GetComponent<PlayerOverhead>().setSlot(i+1);
 			
             //set the appropriate links for the broodmother
             if (playerData[i].control.Equals("AI"))

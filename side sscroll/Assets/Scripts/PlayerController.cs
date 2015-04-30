@@ -177,6 +177,9 @@ public class PlayerController : MonoBehaviour
             ai.ourPlayer = this;//this activate the AI, essentially
             aiEnabled = true;
         }
+		
+		//grab our overhead display
+        GetComponent<PlayerOverhead>().connectedPlayer = this;
     }
     
     protected virtual void Update ()

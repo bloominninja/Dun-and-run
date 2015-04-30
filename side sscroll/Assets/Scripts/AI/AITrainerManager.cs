@@ -14,15 +14,9 @@ public class AiTrainerManager
 	public AiBase ai3 = null;
 	public AiBase ai4 = null;
 	
-<<<<<<< HEAD
-	public bool trainingMode = true;
+	public bool trainingMode = false;
 	public bool runningMode = false;
 	public bool disabled = false;
-=======
-    public bool trainingMode = false;
-    public bool runningMode = false;
-    public bool disabled = false;
->>>>>>> e90840fecd0418145cc426cec828d010bd8630fb
 	
 	bool started = false;
 	
@@ -39,7 +33,7 @@ public class AiTrainerManager
 	
 	int genomesPerSet = 4;
 	
-	const double timerReset = 15;
+	const double timerReset = 20;
 	
 	double lastTime = timerReset;
 	double timer = 0;//timerReset seconds per cycle default
@@ -60,9 +54,9 @@ public class AiTrainerManager
 	int[] fittestIDs = new int[fittestNum];
 	
 	//for our reference
-	int inputLayerCount = 74;
-	int layer1Count = 20;
-	int layer2Count = 10;
+	int inputLayerCount = 14;
+	int layer1Count = 25;
+	int layer2Count = 20;
 	int outputLayerCount = 6;
 	
 	double mutationAmount = 0.005;//0.01, 0.1, 1.0 for mutation amounts
@@ -71,7 +65,7 @@ public class AiTrainerManager
 	double mutationPercentLower = 0.01;//1%
 	double mutationPercentUpper = 0.02;//2%
 	
-	System.Random rnd = new System.Random();
+	public System.Random rnd = new System.Random();
 
 	// Use this for initialization
 	public void Start ()
@@ -80,7 +74,7 @@ public class AiTrainerManager
 		
 		if(trainingMode)//pump the timescale if we're training to learn faster!
 		{
-			Time.timeScale = 2.0f;
+			Time.timeScale = 6.0f;
 		}
 		
 		if(disabled)
@@ -229,8 +223,15 @@ public class AiTrainerManager
 					//make sure to step our genetic process here!
 					currentSet++;
 					
+					if(currentSet == 17)
+						Debug.Log("RESET ME");
+					
 					if((currentSet)*genomesPerSet  > maxGenome)
 					{				
+						//reset our stats
+						currentSet = 1;
+						totalIterations++;
+						
 						//ignore modifying genomes if not training
 						if(trainingMode)
 						{
@@ -244,14 +245,11 @@ public class AiTrainerManager
 							shuffleGeneticPool();
 						}
 						
-						//reset our stats
-						currentSet = 1;
-						totalIterations++;
-						
 						//reset the scorings
 						for(int i=0; i<maxGenome; i++)
 							scores[i] = 0.0;
 					}
+					
 				}
 				else
 				{
@@ -336,16 +334,14 @@ public class AiTrainerManager
 				double mutateRate = (inputToLayer1Genes[i][j] * 0.1)-inputToLayer1Genes[i][j]*0.05;
 				mutate((float)mutateRate, mutationChance, inputToLayer1Genes[i], j);
 			}
-			Debug.Log(layer1ToLayer2Genes[i].Count);
-			Debug.Log(layer1Count*layer2Count);
 			for(int j=0; j<layer1Count*layer2Count; j++)
 			{
-				double mutateRate = (inputToLayer1Genes[i][j] * 0.1)-inputToLayer1Genes[i][j]*0.05;
+				double mutateRate = (layer1ToLayer2Genes[i][j] * 0.1)-layer1ToLayer2Genes[i][j]*0.05;
 				mutate((float)mutateRate, mutationChance, layer1ToLayer2Genes[i], j);
 			}
 			for(int j=0; j<layer2Count*outputLayerCount; j++)
 			{
-				double mutateRate = (inputToLayer1Genes[i][j] * 0.1)-inputToLayer1Genes[i][j]*0.05;
+				double mutateRate = (layer2ToOutputGenes[i][j] * 0.1)-layer2ToOutputGenes[i][j]*0.05;
 				mutate((float)mutateRate, mutationChance, layer2ToOutputGenes[i], j);
 			}
 		}
@@ -552,11 +548,10 @@ public class AiTrainerManager
 				break;
 		}
 		
-		playerAI.aiBroodmother = this;
-	}
 	
-	if (playerAI != null)
-		playerAI.aiBroodmother = this;
+		if (playerAI != null)
+			playerAI.aiBroodmother = this;
+	}
 	
 	public void loadNetwork(AiBase ai)
 	{
