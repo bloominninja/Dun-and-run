@@ -15,7 +15,7 @@ public class AiTrainerManager
 	public AiBase ai4 = null;
 	
 	public bool trainingMode = false;
-	public bool runningMode = false;
+	public bool runningMode = true;
 	public bool disabled = false;
 	
 	bool started = false;
@@ -72,13 +72,13 @@ public class AiTrainerManager
 	{
 		disabled = !trainingMode && !runningMode;
 		
+		if(disabled)
+			return;
+		
 		if(trainingMode)//pump the timescale if we're training to learn faster!
 		{
 			Time.timeScale = 6.0f;
 		}
-		
-		if(disabled)
-			return;
 		
 		//create the genome storage
 		for(int i=0; i<maxGenome; i++)
@@ -133,6 +133,9 @@ public class AiTrainerManager
 	
 	public void OnDestroy()
 	{
+		
+		if(disabled)
+			return;
 		//store our genomes quickly!
 		
 		
@@ -191,7 +194,7 @@ public class AiTrainerManager
 			}
 			
 			//check if the timer is up
-			if(timer < 0)
+			if(timer < 0 && trainingMode)
 			{
 				if(ai1 != null)
 				{

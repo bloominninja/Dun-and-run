@@ -1,13 +1,19 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MenuCharSelect : MonoBehaviour
 {
     public GameObject[] players;
     public MenuCharSelectWindow[] windows;
 
-    protected bool fillWithBots = false;//default to true for now to test
+    protected bool fillWithBots = true;//default to true for now to test
+	
+	const int playableCount = 3;
+	Image[] characterIcons = new Image[playableCount];
+	
+	Dictionary<string, int> charID = new Dictionary<string, int>();
 
     private int i;
 
@@ -21,11 +27,16 @@ public class MenuCharSelect : MonoBehaviour
     }
     void Start ()
     {
+		//load character data
+		charID.Add("Hero",0);
+		charID.Add("Princess",1);
+		charID.Add("Soldier",2);
+		
         windows = new MenuCharSelectWindow[4];
         for (i = 0; i<4; i++)
         {
-            windows[i] = new MenuCharSelectWindow();
-            windows[i].Set(players[i].gameObject, "Player " + (i + 1).ToString());
+            windows[i] = new MenuCharSelectWindow(i+1);
+            windows[i].Set(this, players[i].gameObject, "Player " + (i + 1).ToString());
         }
         if (GameManager.o.numPlayers > 0)
         {
@@ -34,12 +45,116 @@ public class MenuCharSelect : MonoBehaviour
                 if (!GameManager.o.playerData[i].active)
                     continue;
                 if (GameManager.o.playerData[i].control == "Keyboard")
-                    windows[i].On("Keyboard", "The Destined Hero", "Press X/Escape to quit");
+				{
+                    windows[i].On("Keyboard", "Press X/Escape to quit");
+					switchCharacter("The Destined Hero", i);
+				}
                 else
-                    windows[i].On(GameManager.o.playerData[i].control, "The Destined Hero", "Press B to quit");
+				{
+                    windows[i].On(GameManager.o.playerData[i].control, "Press B to quit");
+					switchCharacter("The Destined Hero", i);
+				}
             }
         }
+		
+		//get all of the selectable character icons
+		foreach (Image img in FindObjectsOfType(typeof(Image)) as Image[])
+		{
+			int id = 0;
+			
+			if(img.name == "Hero Panel")
+			{
+				charID.TryGetValue("Hero", out id);
+				id++;
+				
+				characterIcons[id-1] = img;
+			}
+			if(img.name == "Princess Panel")
+			{
+				charID.TryGetValue("Princess", out id);
+				id++;
+				
+				characterIcons[id-1] = img;
+			}
+			if(img.name == "Soldier Panel")
+			{
+				charID.TryGetValue("Soldier", out id);
+				id++;
+				
+				characterIcons[id-1] = img;
+			}
+		}
     }
+	
+	void switchCharacter(string charName, int slot)
+	{
+		int index = slot + 1;
+			
+		int offset = 0;
+		
+		if(charName == "The Destined Hero")
+		{
+            windows[slot].textCharacter.text = "The Destined Hero";
+			windows[slot].bigIcon.sprite = (Resources.Load<Sprite>("Graphics/Character Select/characters/standalone/hero_"+index+"_single"));
+			
+			//update cursor image
+			if(windows[slot].characterCursor != null)
+			{
+				//set its image
+				windows[slot].characterCursor.sprite = (Resources.Load<Sprite>("Graphics/In-Game GUI/overhead_arrow_p"+index));
+			}
+		}
+		
+		else if(charName == "Adventuring Princess")
+		{
+            windows[slot].textCharacter.text = "The Destined Hero";
+			windows[slot].bigIcon.sprite = (Resources.Load<Sprite>("Graphics/Character Select/characters/standalone/princess_"+index+"_single"));
+			
+			//update cursor image
+			if(windows[slot].characterCursor != null)
+			{
+				//set its image
+				windows[slot].characterCursor.sprite = (Resources.Load<Sprite>("Graphics/In-Game GUI/overhead_arrow_p"+index));
+			}
+			
+			offset = 1;
+		}
+		
+		else if(charName == "Wandering Soldier")
+		{
+            windows[slot].textCharacter.text = "The Destined Hero";
+			windows[slot].bigIcon.sprite = (Resources.Load<Sprite>("Graphics/Character Select/characters/standalone/soldier_"+index+"_single"));
+			
+			//update cursor image
+			if(windows[slot].characterCursor != null)
+			{
+				//set its image
+				windows[slot].characterCursor.sprite = (Resources.Load<Sprite>("Graphics/In-Game GUI/overhead_arrow_p"+index));
+			}
+			
+			offset = 2;
+		}
+		
+		//load the transform
+		if(windows[slot].characterCursor != null)
+		{			
+			Vector2 p1 = new Vector2(-20,20);
+			Vector2 p2 = new Vector2(20,20);
+			Vector2 p3 = new Vector2(-20,-20);
+			Vector2 p4 = new Vector2(20,-20);
+			
+			float xDiff = 68*offset;
+			
+			if(slot==0)
+				windows[slot].characterCursor.transform.localPosition = new Vector3( p1.x + xDiff, p1.y, 0);
+			else if(slot==1)
+				windows[slot].characterCursor.transform.localPosition = new Vector3( p2.x + xDiff, p2.y, 0);
+			else if(slot==2)
+				windows[slot].characterCursor.transform.localPosition = new Vector3( p3.x + xDiff, p3.y, 0);
+			else if(slot==3)
+				windows[slot].characterCursor.transform.localPosition = new Vector3( p4.x + xDiff, p4.y, 0);
+		}
+	}
 	
     // Update is called once per frame
     void Update ()
@@ -51,7 +166,8 @@ public class MenuCharSelect : MonoBehaviour
                 if (GameManager.o.FindPlayer("Joy1") == -1)
                 {
                     i = GameManager.o.AddPlayer("Joy1", 1);
-                    windows[i].On("Joy1", "The Destined Hero", "Press B to quit");
+                    windows[i].On("Joy1", "Press B to quit");
+					switchCharacter("The Destined Hero", i);
                 }
             }
             if (Input.GetButtonDown("Joy2 Confirm"))
@@ -59,7 +175,8 @@ public class MenuCharSelect : MonoBehaviour
                 if (GameManager.o.FindPlayer("Joy2") == -1)
                 {
                     i = GameManager.o.AddPlayer("Joy2", 2);
-                    windows[i].On("Joy2", "The Destined Hero", "Press B to quit");
+                    windows[i].On("Joy2", "Press B to quit");
+					switchCharacter("The Destined Hero", i);
                 }
             }
             if (Input.GetButtonDown("Joy3 Confirm"))
@@ -67,7 +184,8 @@ public class MenuCharSelect : MonoBehaviour
                 if (GameManager.o.FindPlayer("Joy3") == -1)
                 {
                     i = GameManager.o.AddPlayer("Joy3", 3);
-                    windows[i].On("Joy3", "The Destined Hero", "Press B to quit");
+                    windows[i].On("Joy3", "Press B to quit");
+					switchCharacter("The Destined Hero", i);
                 }
             }
             if (Input.GetButtonDown("Joy4 Confirm"))
@@ -75,7 +193,8 @@ public class MenuCharSelect : MonoBehaviour
                 if (GameManager.o.FindPlayer("Joy4") == -1)
                 {
                     i = GameManager.o.AddPlayer("Joy4", 4);
-                    windows[i].On("Joy4", "The Destined Hero", "Press B to quit");
+                    windows[i].On("Joy4", "Press B to quit");
+					switchCharacter("The Destined Hero", i);
                 }
             }
             if (Input.GetButtonDown("KB Confirm"))
@@ -83,7 +202,8 @@ public class MenuCharSelect : MonoBehaviour
                 if (GameManager.o.FindPlayer("Keyboard") == -1)
                 {
                     i = GameManager.o.AddPlayer("Keyboard", 5);
-                    windows[i].On("Keyboard", "The Destined Hero", "Press X/Escape to quit");
+                    windows[i].On("Keyboard", "Press X/Escape to quit");
+					switchCharacter("The Destined Hero", i);
                 }
             }
             if (Input.GetButtonDown("Xcade1 Confirm"))
@@ -91,7 +211,8 @@ public class MenuCharSelect : MonoBehaviour
                 if (GameManager.o.FindPlayer("Xcade1") == -1)
                 {
                     i = GameManager.o.AddPlayer("Xcade1", 6);
-                    windows[i].On("Xcade1", "The Destined Hero", "Press B to quit");
+                    windows[i].On("Xcade1", "Press B to quit");
+					switchCharacter("The Destined Hero", i);
                 }
             }
             if (Input.GetButtonDown("Xcade2 Confirm"))
@@ -99,7 +220,8 @@ public class MenuCharSelect : MonoBehaviour
                 if (GameManager.o.FindPlayer("Xcade2") == -1)
                 {
                     i = GameManager.o.AddPlayer("Xcade2", 7);
-                    windows[i].On("Xcade 2", "The Destined Hero", "Press B to quit");
+                    windows[i].On("Xcade 2", "Press B to quit");
+					switchCharacter("The Destined Hero", i);
                 }
             }
         }
@@ -178,7 +300,7 @@ public class MenuCharSelect : MonoBehaviour
             {
                 Debug.Log(i.ToString());
                 GameManager.o.playerData[i].character = 2;
-                windows[i].textCharacter.text = "Adventuring Princess";
+				switchCharacter("Adventuring Princess", i);
             }
         }
         if (Input.GetButtonDown("Joy2 Grab1"))
@@ -187,7 +309,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 2;
-                windows[i].textCharacter.text = "Adventuring Princess";
+				switchCharacter("Adventuring Princess", i);
             }
         }
         if (Input.GetButtonDown("Joy3 Grab1"))
@@ -196,7 +318,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 2;
-                windows[i].textCharacter.text = "Adventuring Princess";
+				switchCharacter("Adventuring Princess", i);
             }
         }
         if (Input.GetButtonDown("Joy4 Grab1"))
@@ -205,7 +327,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 2;
-                windows[i].textCharacter.text = "Adventuring Princess";
+				switchCharacter("Adventuring Princess", i);
             }
         }
         if (Input.GetButtonDown("KB Grab1"))
@@ -214,7 +336,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 2;
-                windows[i].textCharacter.text = "Adventuring Princess";
+				switchCharacter("Adventuring Princess", i);
             }
         }
         if (Input.GetButtonDown("Xcade1 Grab1"))
@@ -223,7 +345,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 2;
-                windows[i].textCharacter.text = "Adventuring Princess";
+				switchCharacter("Adventuring Princess", i);
             }
         }
         if (Input.GetButtonDown("Xcade2 Grab1"))
@@ -232,7 +354,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 2;
-                windows[i].textCharacter.text = "Adventuring Princess";
+				switchCharacter("Adventuring Princess", i);
             }
         }
         
@@ -242,7 +364,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 3;
-                windows[i].textCharacter.text = "Wandering Soldier";
+				switchCharacter("Wandering Soldier", i);
             }
         }
         if (Input.GetButtonDown("Joy2 Grab2"))
@@ -251,7 +373,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 3;
-                windows[i].textCharacter.text = "Wandering Soldier";
+				switchCharacter("Wandering Soldier", i);
             }
         }
         if (Input.GetButtonDown("Joy3 Grab2"))
@@ -260,7 +382,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 3;
-                windows[i].textCharacter.text = "Wandering Soldier";
+				switchCharacter("Wandering Soldier", i);
             }
         }
         if (Input.GetButtonDown("Joy4 Grab2"))
@@ -269,7 +391,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 3;
-                windows[i].textCharacter.text = "Wandering Soldier";
+				switchCharacter("Wandering Soldier", i);
             }
         }
         if (Input.GetButtonDown("KB Grab2"))
@@ -278,7 +400,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 3;
-                windows[i].textCharacter.text = "Wandering Soldier";
+				switchCharacter("Wandering Soldier", i);
             }
         }
         if (Input.GetButtonDown("Xcade1 Grab2"))
@@ -287,7 +409,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 3;
-                windows[i].textCharacter.text = "Wandering Soldier";
+				switchCharacter("Wandering Soldier", i);
             }
         }
         if (Input.GetButtonDown("Xcade2 Grab1"))
@@ -296,7 +418,7 @@ public class MenuCharSelect : MonoBehaviour
             if (i >= 0)
             {
                 GameManager.o.playerData[i].character = 3;
-                windows[i].textCharacter.text = "Wandering Soldier";
+				switchCharacter("Wandering Soldier", i);
             }
         }
 
@@ -357,31 +479,39 @@ public class MenuCharSelect : MonoBehaviour
 
 public class MenuCharSelectWindow
 {
+	int slot = 1;
     public GameObject window;
-    public Text textPlayer;
     public Text textControl;
     public Text textCharacter;
     public Text textQuit;
     public Text textJoin;
-    public Image windowInside;
-    public Color colorWindow;
-    public Color colorPlayer;
-    public Color colorText;
-
-    public MenuCharSelectWindow ()
+    public Image bigIcon;
+	
+	public Image characterCursor = null;
+	
+    public MenuCharSelectWindow (int newSlot)
     {
-
+		slot = newSlot;
     }
 
-    public void Set (GameObject o, string player)
+    public void Set (MenuCharSelect charSelect, GameObject o, string player)
     {
+		//grab our selection icon
+		
+		//get all of the selectable character icons
+		foreach (Image img in MenuCharSelect.FindObjectsOfType(typeof(Image)) as Image[])
+		{
+			if(img.name == "Cursor_P"+slot)
+			{
+				characterCursor = img;
+			}
+		}
+		
         window = o;
         Text[] ta = o.GetComponentsInChildren<Text>();
         foreach (Text t in ta)
         {
-            if (t.name == "Player")
-                textPlayer = t;
-            else if (t.name == "Control")
+            if (t.name == "Control")
                 textControl = t;
             else if (t.name == "Character")
                 textCharacter = t;
@@ -390,44 +520,34 @@ public class MenuCharSelectWindow
             else if (t.name == "Join")
                 textJoin = t;
         }
-        textPlayer.text = player;
-        colorText = textPlayer.color;
-
-        Image[] ia = o.GetComponentsInChildren<Image>();
-        foreach (Image i in ia)
+        Image[] tb = o.GetComponentsInChildren<Image>();
+        foreach (Image t in tb)
         {
-            if (i.name == "Inside")
-                windowInside = i;
+            if (t.name == "big image")
+                bigIcon = t;
         }
-        colorPlayer = window.GetComponent<Image>().color;
-        colorWindow = windowInside.color;
 
         Off();
     }
 
-    public void On (string control, string character, string quit)
+    public void On (string control, string quit)
     {
         textControl.text = control;
-        textCharacter.text = character;
         textQuit.text = quit;
-
-        textPlayer.color = colorText;
-        textControl.color = colorText;
-        textCharacter.color = colorText;
-        textQuit.color = colorText;
-        textJoin.color = Color.clear;
-        
-        window.GetComponent<Image>().color = colorPlayer;
+		textJoin.text = "";
     }
 
     public void Off ()
     {
-        textPlayer.color = Color.clear;
-        textControl.color = Color.clear;
-        textCharacter.color = Color.clear;
-        textQuit.color = Color.clear;
-        textJoin.color = colorText;
-
-        window.GetComponent<Image>().color = colorWindow;
+        textControl.text = "";
+        textCharacter.text = "Open Slot";
+        textQuit.text = "";
+		textJoin.text = "Press Confirm";
+		
+		if(characterCursor != null)
+			characterCursor.sprite = (Resources.Load<Sprite>("Graphics/Character Select/characters/standalone/null"));
+		
+		if(bigIcon != null)
+			bigIcon.sprite = (Resources.Load<Sprite>("Graphics/Character Select/characters/standalone/null"));
     }
 }

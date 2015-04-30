@@ -67,7 +67,9 @@ public class GameManager : MonoBehaviour
             if (i <= 1)
             {
                 end = true;
-                endTimer = 2;
+                endTimer = 5;
+				
+				GameObject temp_display = (GameObject)Instantiate(Resources.Load<GameObject>("Prefabs/Interface/AllFightersDefeated"));
             }
         }
 		
