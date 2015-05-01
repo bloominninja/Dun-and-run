@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerPhysics : CustomPhysics
 {
     public float ledge;
-
+    
     protected override void Start ()
     {
         base.Start();
@@ -27,7 +27,7 @@ public class PlayerPhysics : CustomPhysics
                 else
                     collideLeft = true;
                 lockX = false;
-            
+                
                 float dst = Vector2.Distance(ray.origin, hits[i2].point);
                 if (dst > skin)
                 {
@@ -48,9 +48,9 @@ public class PlayerPhysics : CustomPhysics
                 float temp = Mathf.Min(6, Mathf.Max(3, Mathf.Abs(speed.x - hits[i2].collider.gameObject.GetComponent<PlayerPhysics>().speed.x)));
                 GetComponent<PlayerController>().Bounce(hits[i2].collider.gameObject, temp * ray.direction * -1);
                 hits[i2].collider.GetComponent<PlayerController>().Bounce(gameObject, temp * ray.direction);
-
+                
                 collide = true;
-            
+                
                 float dst = Vector2.Distance(ray.origin, hits[i2].point);
                 if (dst > skin)
                 {

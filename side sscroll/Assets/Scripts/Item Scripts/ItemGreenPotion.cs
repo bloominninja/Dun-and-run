@@ -4,7 +4,7 @@ using System.Collections;
 public class ItemGreenPotion : ActiveItem
 {
     public bool on = false;
-    private float regenTime = 2.5f;
+    private float regenTime = 1.5f;
     private float regenTimeCurrent;
     private int regenCount = 4;
     private int regenCountCurrent;
@@ -13,28 +13,8 @@ public class ItemGreenPotion : ActiveItem
     protected override void Start ()
     {
         base.Start();
-        cooldown = 30;
+        cooldown = 45;
         cost = 0;
-    }
-    
-    protected override void Update ()
-    {
-        base.Update();
-    }
-    
-    protected override void LateUpdate ()
-    {
-        base.LateUpdate();
-    }
-    
-    public override void OnPickup (PlayerController player)
-    {
-        base.OnPickup(player);
-    }
-    
-    public override void OnDrop (PlayerController player)
-    {
-        base.OnDrop(player);
     }
 
     public override void Tick (PlayerController player)
@@ -45,12 +25,18 @@ public class ItemGreenPotion : ActiveItem
             regenTimeCurrent -= Time.deltaTime;
             if (regenTimeCurrent <= 0)
             {
-                player.currentHealth += 1;
-                if (player.currentHealth > player.maxHealth)
-                    player.currentHealth = player.maxHealth;
-                player.currentMagic += 1;
-                if (player.currentMagic > player.maxMagic)
-                    player.currentMagic = player.maxMagic;
+                if (regenCount % 2 == 0)
+                {
+                    player.currentHealth += 1;
+                    if (player.currentHealth > player.maxHealth)
+                        player.currentHealth = player.maxHealth;
+                }
+                else
+                {
+                    player.currentMagic += 1;
+                    if (player.currentMagic > player.maxMagic)
+                        player.currentMagic = player.maxMagic;
+                }
 
                 regenCountCurrent -= 1;
                 if (regenCountCurrent <= 0)

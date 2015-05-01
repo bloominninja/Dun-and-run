@@ -7,10 +7,9 @@ public class AnimatorPrincess : CustomAnimator
     
     public override void LateUpdate ()
     {
-        base.LateUpdate();
         if (animator != null)
         {
-            if (player.defeated)
+            if (state == "defeated")
             {
                 if (currentAnim != "Defeated")
                 {
@@ -21,7 +20,7 @@ public class AnimatorPrincess : CustomAnimator
                 }
                 
             }
-            else if (hurt)
+            else if (state == "hurt")
             {
                 if (currentAnim != "Hurt_Air" && currentAnim != "Hurt_Ground")
                 {
@@ -31,7 +30,7 @@ public class AnimatorPrincess : CustomAnimator
                         currentAnim = "Hurt_Air";
                 }
             }
-            else if (attacking)
+            else if (state == "basic")
             {
                 if (currentAnim != "Attack_Air" && currentAnim != "Attack_Ground")
                 {
@@ -41,13 +40,13 @@ public class AnimatorPrincess : CustomAnimator
                         currentAnim = "Attack_Ground";
                 }
             }
-            else if (specialFire)
+            else if (state == "special")
             {
-                //currentAnim = "Special_Fire";
+                currentAnim = "Roll";
             }
-            else if (special)
+            else if (state == "charge")
             {
-                //currentAnim = "Special";
+                currentAnim = "Charge_Attack";
             }
             else if (!physics.collideBottom)
             {
@@ -67,6 +66,36 @@ public class AnimatorPrincess : CustomAnimator
                 currentAnim = "Idle";
             }
             animator.Play(currentAnim);
+
+        }
+        base.LateUpdate();
+        
+        if (player.basicChargeTime == player.basicChargeTimeMax)
+        {
+            whiteTimer -= Time.deltaTime;
+            if (whiteTimer <= 0)
+            {
+                whiteToggle = !whiteToggle;
+                opacityTimer = 0.2f;
+            }
+        }
+        else
+        {
+            whiteTimer = 0.2f;
+            whiteToggle = false;
+        }
+        
+        
+        if (whiteToggle)
+        {
+            foreach (Sprite s in whiteSheet)
+            {
+                if (s.name == rend.sprite.name)
+                {
+                    rend.sprite = s;
+                    break;
+                }
+            }
         }
     }
 }

@@ -7,10 +7,9 @@ public class AnimatorSoldier : CustomAnimator
     
     public override void LateUpdate ()
     {
-        base.LateUpdate();
         if (animator != null)
         {
-            if (player.defeated)
+            if (state == "defeated")
             {
                 if (currentAnim != "Defeated")
                 {
@@ -21,7 +20,7 @@ public class AnimatorSoldier : CustomAnimator
                 }
                 
             }
-            else if (hurt)
+            else if (state == "hurt")
             {
                 if (currentAnim != "Hurt_Air" && currentAnim != "Hurt_Ground")
                 {
@@ -31,7 +30,17 @@ public class AnimatorSoldier : CustomAnimator
                         currentAnim = "Hurt_Air";
                 }
             }
-            else if (attacking)
+            else if (state == "basic start")
+            {
+                if (currentAnim != "Attack_Air_Start" && currentAnim != "Attack_Ground_Start")
+                {
+                    if (!physics.collideBottom)
+                        currentAnim = "Attack_Air_Start";
+                    else
+                        currentAnim = "Attack_Ground_Start";
+                }
+            }
+            else if (state == "basic")
             {
                 if (currentAnim != "Attack_Air" && currentAnim != "Attack_Ground")
                 {
@@ -41,13 +50,27 @@ public class AnimatorSoldier : CustomAnimator
                         currentAnim = "Attack_Ground";
                 }
             }
-            else if (specialFire)
+            else if (state == "basic end")
             {
-                //currentAnim = "Special_Fire";
+                if (currentAnim != "Attack_Air_End" && currentAnim != "Attack_Ground_End")
+                {
+                    if (!physics.collideBottom)
+                        currentAnim = "Attack_Air_End";
+                    else
+                        currentAnim = "Attack_Ground_End";
+                }
             }
-            else if (special)
+            else if (state == "special start")
             {
-                //currentAnim = "Special";
+                currentAnim = "Special_Start";
+            }
+            else if (state == "special")
+            {
+                currentAnim = "Special";
+            }
+            else if (state == "special end")
+            {
+                currentAnim = "Special_End";
             }
             else if (!physics.collideBottom)
             {
@@ -68,5 +91,6 @@ public class AnimatorSoldier : CustomAnimator
             }
             animator.Play(currentAnim);
         }
+        base.LateUpdate();
     }
 }

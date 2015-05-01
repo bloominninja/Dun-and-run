@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
     public int direction = 1;
     public int extraJumps = 0;
     public int extraJumpsCurrent = 0;
-    public float magicRecharge = 3;
+    public float magicRecharge = 5;
     public float magicRechargeCurrent = 0;
     public float basicCooldown = 1;
     public float specialCooldown = 1;
@@ -32,10 +32,11 @@ public class PlayerController : MonoBehaviour
     public bool invincible = false;
     public float invincibleTime = 0;
     public float invincibleDur = 1;
-	
-	public float specialChargeTime = 0.0f;//moved for AI, should operate the same
-    public float specialChargeTimeMax = 0.3f;
-	
+    
+    public float specialChargeTime = 0.0f;//moved for AI, should operate the same
+    public float specialChargeTimeMax = 0.7f;
+    public float basicChargeTime, basicChargeTimeMax = 0.7f;
+    
     public bool defeated = false;
     [HideInInspector]
     protected Item
@@ -43,16 +44,25 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public bool
         grab = false;
-
+    
+    //unique number to distinguish which character is in use, set by the prefabs
+    //0 is none, and if on an existing character should be treated as an error
+    //1 is hero, 2 is princess, 3 is soldier, 4 is hunter
+    public int id = 0;
+    
     //protected Values
     [HideInInspector]
     public PlayerPhysics
         physics;
-    protected CustomAnimator animator;
+    public CustomAnimator animator;
     //[HideInInspector]
     public BoxCollider2D
         box;
-
+    
+    protected bool pickup = false;
+    protected bool pickupToggle = false;
+    protected float wallJump = 0;
+    
     //input-focused variables
     public string inputType = "Keyboard";
     //input string variables, use any of the strings in the Input Manager
@@ -73,14 +83,12 @@ public class PlayerController : MonoBehaviour
     protected bool prevRight = false;
     protected bool prevUp = false;
     protected bool prevDown = false;
-    protected bool prevSpecial = false;
-
+    public bool prevSpecial = false;
+    
     protected bool inputLock = false;
     protected float lockTime;
-	
-	public int id = 1;//for character id, could not find it - Erin
-	
-	
+    
+    
     //AI specific variables, DO NOT TOUCH -Erin
     public AiBase ai;
     public bool aiEnabled = false;
@@ -93,15 +101,18 @@ public class PlayerController : MonoBehaviour
     public bool aiItem2 = false;//use to proc item 2
     public bool aiPickup1 = false;//used to initiate an item pickup
     public bool aiPickup2 = false;//used to initiate an item pickup
-
-    protected virtual void Start ()
+    
+    protected virtual void Awake ()
     {
         physics = GetComponent<PlayerPhysics>();
         animator = GetComponent<CustomAnimator>();
         box = GetComponent<BoxCollider2D>();
         ai = GetComponent<AiBase>();
         passives = new List<Item>();
-
+    }
+    
+    protected virtual void Start ()
+    {
         if (inputType == "Keyboard")
         {
             horizontal = "KB Horizontal";
@@ -172,13 +183,41 @@ public class PlayerController : MonoBehaviour
             pause = "Joy4 Pause";
             select = "Joy4 Select";
         }
+        else if (inputType == "Xcade1")
+        {
+            horizontal = "Xcade1 Horizontal";
+            vertical = "Xcade1 Vertical";
+            jump = "Xcade1 Jump";
+            attack = "Xcade1 Attack";
+            special = "Xcade1 Special";
+            item1 = "Xcade1 Item1";
+            item2 = "Xcade1 Item2";
+            grab1 = "Xcade1 Grab1";
+            grab2 = "Xcade1 Grab2";
+            pause = "Xcade1 Pause";
+            select = "Xcade1 Select";
+        }
+        else if (inputType == "Xcade2")
+        {
+            horizontal = "Xcade2 Horizontal";
+            vertical = "Xcade2 Vertical";
+            jump = "Xcade2 Jump";
+            attack = "Xcade2 Attack";
+            special = "Xcade2 Special";
+            item1 = "Xcade2 Item1";
+            item2 = "Xcade2 Item2";
+            grab1 = "Xcade2 Grab1";
+            grab2 = "Xcade2 Grab2";
+            pause = "Xcade2 Pause";
+            select = "Xcade2 Select";
+        }
         else if (inputType == "AI")
         {
             ai.ourPlayer = this;//this activate the AI, essentially
             aiEnabled = true;
         }
-		
-		//grab our overhead display
+        
+        //grab our overhead display
         GetComponent<PlayerOverhead>().connectedPlayer = this;
     }
     
@@ -214,7 +253,7 @@ public class PlayerController : MonoBehaviour
                     }
                 }
             }
-
+            
             if (basicCooldownCurrent > 0)
                 basicCooldownCurrent -= Time.deltaTime;
             if (specialCooldownCurrent > 0)
@@ -223,10 +262,19 @@ public class PlayerController : MonoBehaviour
                 active1CooldownCurrent -= Time.deltaTime;
             if (active2CooldownCurrent > 0)
                 active2CooldownCurrent -= Time.deltaTime;
-
-            grab = false;
+            
+            if (wallJump != 0)
+            {
+                if (Time.deltaTime > Mathf.Abs(wallJump))
+                    wallJump = 0;
+                else
+                    wallJump -= Time.deltaTime * Mathf.Sign(wallJump);
+            }
+            
+            grab = false;            
+            pickup = false;
             s = Vector2.zero;
-
+            
             if (inputLock)
             {
                 lockTime -= Time.deltaTime;
@@ -245,7 +293,7 @@ public class PlayerController : MonoBehaviour
                     s.x = speed;
                     direction = 1;
                 }
-
+                
                 if (Jump())
                 {
                     if (physics.speed.y >= 0)
@@ -253,7 +301,7 @@ public class PlayerController : MonoBehaviour
                     else
                         s.y = jumpHeight / 5;
                 }
-
+                
                 if (physics.collideBottom)
                 {
                     extraJumpsCurrent = extraJumps;
@@ -264,133 +312,165 @@ public class PlayerController : MonoBehaviour
                 }
                 else if (physics.collideRight)
                 {
-                    if (Right() && physics.ledge > 0 && physics.speed.y <= 0)
+                    if (Right())
                     {
-                        transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
-                        if (JumpPressed())
+                        wallJump = 0.1f;
+                        if (physics.ledge > 0 && physics.speed.y <= 0)
                         {
-                            physics.SetSpeedY(jumpHeight, 0.15f);
+                            transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
+                            if (JumpPressed())
+                            {
+                                physics.SetSpeedY(jumpHeight, 0.15f);
+                                wallJump = 0;
+                            }
+                            else
+                                physics.SetSpeedY(0, 0);
                         }
-                        else
-                            physics.SetSpeedY(0, 0);
+                        else if (physics.speed.y <= -physics.gravity / 4)
+                        {
+                            physics.SetSpeedY(-physics.gravity / 4, 0);
+                        }
                     }
-                    else if (JumpPressed())
+                    
+                    if (wallJump != 0 && JumpPressed())
                     {
                         physics.SetSpeedX(-speed, 0.15f);
                         physics.SetSpeedY(jumpHeight, 0.15f);
-                    }
-                    else if (Right() && physics.speed.y <= -physics.gravity / 4)
-                    {
-                        physics.SetSpeedY(-physics.gravity / 4, 0);
+                        wallJump = 0;
                     }
                 }
                 else if (physics.collideLeft)
                 {
-                    if (Left() && physics.ledge > 0 && physics.speed.y <= 0)
+                    if (Left())
                     {
-                        transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
-                        if (JumpPressed())
+                        wallJump = -0.1f;
+                        if (physics.ledge > 0 && physics.speed.y <= 0)
                         {
-                            physics.SetSpeedY(jumpHeight, 0.15f);
+                            transform.position = new Vector3(transform.position.x, physics.ledge - transform.localScale.y / 1.5f, transform.position.z);
+                            if (JumpPressed())
+                            {
+                                physics.SetSpeedY(jumpHeight, 0.15f);
+                                wallJump = 0;
+                            }
+                            else
+                                physics.SetSpeedY(0, 0);
                         }
-                        else
-                            physics.SetSpeedY(0, 0);
+                        else if (physics.speed.y <= -physics.gravity / 4)
+                        {
+                            physics.SetSpeedY(-physics.gravity / 4, 0);
+                        }
                     }
-                    else if (JumpPressed())
+                    
+                    if (wallJump != 0 && JumpPressed())
+                    {
+                        
+                        physics.SetSpeedX(speed, 0.15f);
+                        physics.SetSpeedY(jumpHeight, 0.15f);
+                        wallJump = 0;
+                    }
+                }
+                else if (wallJump != 0 && JumpPressed())
+                {
+                    if (wallJump > 0)
+                    {
+                        physics.SetSpeedX(-speed, 0.15f);
+                        physics.SetSpeedY(jumpHeight, 0.15f);
+                    }
+                    else
                     {
                         physics.SetSpeedX(speed, 0.15f);
                         physics.SetSpeedY(jumpHeight, 0.15f);
                     }
-                    else if (Left() && physics.speed.y <= -physics.gravity / 4)
-                    {
-                        physics.SetSpeedY(-physics.gravity / 4, 0);
-                    }
+                    wallJump = 0;
                 }
                 else if (extraJumpsCurrent > 0 && JumpPressed())
                 {
                     extraJumpsCurrent --;
                     physics.SetSpeedY(jumpHeight, 0.15f);
                 }
-				else if(extraJumpsCurrent == 0 && JumpPressed() && inputType == "AI")
-				{
-					//for scoring the AI for mistakes
-					if(ai != null)
-					{
-						ai.score -= 0.25;
-					}
-				}
-
+                else if (extraJumpsCurrent == 0 && JumpPressed() && inputType == "AI")
+                {
+                    //for scoring the AI for mistakes
+                    if (ai != null)
+                    {
+                        ai.score -= 0.25;
+                    }
+                }
+                
                 if (AttackPressed())
                     AttackEffect();
-
-                if (SpecialPressed())
+                else if (SpecialPressed())
                     SpecialEffect();
-
-                if (Grab1Pressed() || Grab2Pressed())
+                
+                if (Grab1Pressed() || Grab2Pressed() || Down())
                     grab = true;
-
-                if (active1 != null && Item1Pressed() && active1CooldownCurrent <= 0)
+                
+                if (active1 != null && Item1Pressed() && active1CooldownCurrent <= 0 && currentMagic >= active1.cost)
                 {
-                    active1.Activate(this);
                     active1CooldownCurrent = active1.cooldown;
+                    currentMagic -= active1.cost;
+                    active1.Activate(this);
                 }
-            
-                if (active2 != null && Item2Pressed() && active2CooldownCurrent <= 0)
+                
+                if (active2 != null && Item2Pressed() && active2CooldownCurrent <= 0 && currentMagic >= active2.cost)
                 {
-                    active2.Activate(this);
                     active2CooldownCurrent = active2.cooldown;
+                    currentMagic -= active2.cost;
+                    active2.Activate(this);
                 }
+                
             }
-
+            
             foreach (Item p in passives)
             {
                 p.Tick(this);
             }
-
+            
             if (active1 != null)
                 active1.Tick(this);
             if (active2 != null)
                 active2.Tick(this);
         }
         physics.Move(s);
-
+        
         prevLeft = Left();
         prevRight = Right();
         prevUp = Up();
         prevDown = Down();
         if (inputType != "Keyboard")
             prevSpecial = Special();
-
+        
         if (currentHealth <= 0)
         {
             gameObject.layer = 0;
             defeated = true;
             physics.collLayer2 = null;
+            animator.state = "defeated";
         }
     }
-
+    
     protected virtual void AttackEffect ()
     {
-		if(inputType == "AI")
-		{
-			if(ai!=null)
-			{
-				ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
-			}
-		}
+        if (inputType == "AI")
+        {
+            if (ai != null)
+            {
+                ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
+            }
+        }
     }
-
+    
     protected virtual void SpecialEffect ()
     {
-		if(inputType == "AI")
-		{
-			if(ai!=null)
-			{
-				ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
-			}
-		}
+        if (inputType == "AI")
+        {
+            if (ai != null)
+            {
+                ai.score -= 5;//penalize not hitting attacks, gets factored in by the time the attack lands
+            }
+        }
     }
-
+    
     public virtual void Bounce (GameObject other, Vector2 sp)
     {
         if (sp.x != 0)
@@ -408,13 +488,21 @@ public class PlayerController : MonoBehaviour
     
     public virtual bool Pickup (Item item)
     {
+        if (pickup)
+            return false;
+        
         passives.Add(item);
         item.OnPickup(this);
+        pickup = true;
         return true;
     }
-
+    
     public virtual bool Pickup (ActiveItem item)
     {
+        if (pickup)
+            return false;
+        pickup = true;
+        
         if (Grab1Pressed())
         {
             if (active1 != null)
@@ -431,7 +519,32 @@ public class PlayerController : MonoBehaviour
             item.OnPickup(this);
             return true;
         }
-        return false;
+        else if (active1 == null)
+        {
+            active1 = item;
+            item.OnPickup(this);
+            return true;
+        }
+        else if (active2 == null)
+        {
+            active2 = item;
+            item.OnPickup(this);
+            return true;
+        }
+        else if (!pickupToggle)
+        {
+            Drop(active1);
+            active1 = item;
+            item.OnPickup(this);
+            return true;
+        }
+        else
+        {
+            Drop(active2);
+            active2 = item;
+            item.OnPickup(this);
+            return true;
+        }
     }
     
     public virtual bool Drop (Item item)
@@ -440,7 +553,7 @@ public class PlayerController : MonoBehaviour
         passives.Remove(item);
         return true;
     }
-
+    
     public virtual bool Drop (ActiveItem item)
     {
         if (active1 == item)
@@ -457,7 +570,7 @@ public class PlayerController : MonoBehaviour
         }
         return false;
     }
-
+    
     public virtual bool Hit (Projectile projectile)
     {
         if (!invincible)
@@ -479,36 +592,46 @@ public class PlayerController : MonoBehaviour
         physics.SetSpeedX(speed * knockbackMult * dir, 0.3f);
         physics.SetSpeedY(jumpHeight * knockbackMult, 0);
         direction = dir * -1;
-        animator.hurt = true;
-		
-		//score depending on source if we are an AI
-		if(inputType == "AI")
-		{
-			if(source != this)
-				ai.score += damage*200;
-			else
-				ai.score -= damage*300;
-		}
+        animator.state = "hurt";
+        
+        //score depending on source if we are an AI
+        if (inputType == "AI")
+        {
+            if (source != this)
+                ai.score += damage * 200;
+            else
+                ai.score -= damage * 300;
+        }
     }
-
+    
+    public virtual void Stun (float time, int dir, PlayerController source)
+    {
+        LockInput(time);
+        physics.SetSpeedX(speed * knockbackMult * dir, 0.3f);
+        physics.SetSpeedY(jumpHeight * knockbackMult, 0);
+        direction = dir * -1;
+        animator.state = "hurt";
+        
+    }
+    
     public virtual void LockInput (float time)
     {
         inputLock = true;
         lockTime = time;
     }
-
+    
     public virtual void UnlockInput ()
     {
         inputLock = false;
-        animator.hurt = false;
+        animator.state = null;
     }
-
+    
     public virtual void SetInvincible (float time)
     {
         invincible = true;
         invincibleTime = time;
     }
-
+    
     #region Input Functions
     protected virtual bool Left ()
     {
@@ -516,7 +639,7 @@ public class PlayerController : MonoBehaviour
         {
             if (aiIdle)
                 return false;
-            else if (aiDirection < 0.5)
+            else if (aiDirection < 0)
                 return true;
             else
                 return false;
@@ -526,7 +649,7 @@ public class PlayerController : MonoBehaviour
         else
             return false;
     }
-
+    
     protected virtual bool LeftPressed ()
     {
         if (aiEnabled)
@@ -546,14 +669,14 @@ public class PlayerController : MonoBehaviour
                 return false;
         }
     }
-
+    
     protected virtual bool LeftReleased ()
     {
         if (aiEnabled)
         {
             if (aiIdle)
                 return true;
-            else if (prevLeft == false || aiDirection < 0.5)
+            else if (prevLeft == false || aiDirection < 0)
                 return false;
             else
                 return true;
@@ -583,14 +706,14 @@ public class PlayerController : MonoBehaviour
         else
             return false;
     }
-
+    
     protected virtual bool RightPressed ()
     {
         if (aiEnabled)
         {
             if (aiIdle)
                 return false;
-            else if (prevRight == false && aiDirection > 0.5)
+            else if (prevRight == false && aiDirection > 0)
                 return true;
             else
                 return false;
@@ -603,14 +726,14 @@ public class PlayerController : MonoBehaviour
                 return false;
         }
     }
-
+    
     protected virtual bool RightReleased ()
     {
         if (aiEnabled)
         {
             if (aiIdle)
                 return true;
-            else if (prevRight == false || aiDirection > 0.5)
+            else if (prevRight == false || aiDirection > 0)
                 return false;
             else
                 return true;
@@ -633,7 +756,7 @@ public class PlayerController : MonoBehaviour
         else
             return false;
     }
-
+    
     protected virtual bool UpPressed ()
     {
         if (prevUp == false && Up())
@@ -641,7 +764,7 @@ public class PlayerController : MonoBehaviour
         else
             return false;
     }
-
+    
     protected virtual bool UpReleased ()
     {
         if (prevUp == true && !Up())
@@ -659,7 +782,7 @@ public class PlayerController : MonoBehaviour
         else
             return false;
     }
-
+    
     protected virtual bool DownPressed ()
     {
         if (prevDown == false && Down())
@@ -667,7 +790,7 @@ public class PlayerController : MonoBehaviour
         else
             return false;
     }
-
+    
     protected virtual bool DownReleased ()
     {
         if (prevDown == true && !Down())
@@ -698,7 +821,7 @@ public class PlayerController : MonoBehaviour
         else
             return Input.GetButtonUp(jump);
     }
-
+    
     protected virtual bool Attack ()
     {
         if (aiEnabled)
@@ -721,15 +844,14 @@ public class PlayerController : MonoBehaviour
         else
             return Input.GetButtonUp(attack);
     }
-
+    
     protected virtual bool Special ()
     {
         if (aiEnabled)
-            return aiSpecial;
-		
+            return false;//ai can't use this
         if (inputType == "Keyboard")
             return Input.GetButton(special);
-
+        
         if (Input.GetAxis(special) > 0)
             return true;
         else
@@ -740,7 +862,7 @@ public class PlayerController : MonoBehaviour
     {
         if (aiEnabled)
             return aiSpecial;
-		
+        
         if (inputType == "Keyboard")
             return Input.GetButtonDown(special);
         if (prevSpecial == false && Special())
@@ -753,7 +875,7 @@ public class PlayerController : MonoBehaviour
     {
         if (aiEnabled)
             return !aiSpecial;
-		
+        
         if (inputType == "Keyboard")
             return Input.GetButtonUp(special);
         if (prevSpecial == true && !Special())
@@ -761,7 +883,7 @@ public class PlayerController : MonoBehaviour
         else
             return false;
     }
-
+    
     protected virtual bool Item1 ()
     {
         if (aiEnabled)
@@ -773,7 +895,7 @@ public class PlayerController : MonoBehaviour
     {
         if (aiEnabled)
             return aiItem1;
-		
+        
         return Input.GetButtonDown(item1);
     }
     
@@ -781,10 +903,10 @@ public class PlayerController : MonoBehaviour
     {
         if (aiEnabled)
             return !aiItem1;
-		
+        
         return Input.GetButtonUp(item1);
     }
-
+    
     protected virtual bool Item2 ()
     {
         if (aiEnabled)
@@ -796,7 +918,7 @@ public class PlayerController : MonoBehaviour
     {
         if (aiEnabled)
             return aiItem2;
-		
+        
         return Input.GetButtonDown(item2);
     }
     
@@ -804,10 +926,10 @@ public class PlayerController : MonoBehaviour
     {
         if (aiEnabled)
             return !aiItem2;
-		
+        
         return Input.GetButtonUp(item2);
     }
-
+    
     protected virtual bool Grab1 ()
     {
         if (aiEnabled)
@@ -830,7 +952,7 @@ public class PlayerController : MonoBehaviour
         else
             return Input.GetButtonUp(grab1);
     }
-
+    
     protected virtual bool Grab2 ()
     {
         if (aiEnabled)
@@ -853,7 +975,7 @@ public class PlayerController : MonoBehaviour
         else
             return Input.GetButtonUp(grab2);
     }
-
+    
     protected virtual bool Pause ()
     {
         if (aiEnabled)
@@ -874,7 +996,7 @@ public class PlayerController : MonoBehaviour
             return false;//ai can't use this
         return Input.GetButtonUp(pause);
     }
-
+    
     protected virtual bool Select ()
     {
         if (aiEnabled)

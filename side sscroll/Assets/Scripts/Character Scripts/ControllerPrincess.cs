@@ -8,9 +8,7 @@ public class ControllerPrincess : PlayerController
     public MeleeProjectile projBasicLeft, projBasicRight, projChargeLeft, projChargeRight;
     
     public bool basicCharge;
-    public float basicChargeTime, basicChargeTimeMax = 0.7f;
     
-    // Use this for initialization
     protected override void Start ()
     {
         base.Start();
@@ -22,17 +20,14 @@ public class ControllerPrincess : PlayerController
         projChargeRight.team = team;
         projBasicLeft.direction = -1;
         projChargeLeft.direction = -1;
-    }
-    
-    // Update is called once per frame
-    protected override void Update ()
-    {
-        base.Update();
-        
+        basicChargeTimeMax = 0.7f;
     }
     
     protected void LateUpdate ()
     {
+        if (GameManager.o.pause)
+            return;
+        
         if (basicCharge)
         {
             basicChargeTime += Time.deltaTime;
@@ -41,16 +36,24 @@ public class ControllerPrincess : PlayerController
             if (!Attack())
             {
                 basicCharge = false;
-                if (AttackReleased() && basicChargeTime == basicChargeTimeMax && currentMagic >= 1)
+                if (basicChargeTime == basicChargeTimeMax && currentMagic >= 1 && !inputLock)
                 {
-                    LockInput(0.3f);
+                    LockInput(0.4f);
                     currentMagic -= 1;
+                    animator.state = "charge";
+                    physics.SetSpeedX(25 * direction, 0.2f, 0);
+                    physics.SetSpeedY(0, 0.2f);
                     if (direction > 0)
                         projChargeRight.Activate(0.2f);
                     else
                         projChargeLeft.Activate(0.2f);
                 }
             }
+        }
+        else
+        {
+            basicChargeTime = 0;
+            basicCharge = true;
         }
     }
     
@@ -64,9 +67,9 @@ public class ControllerPrincess : PlayerController
                 projBasicRight.Activate(0.2f);
             else
                 projBasicLeft.Activate(0.2f);
-            physics.speed.x += 6 * direction;
-            animator.attacking = true;
-            LockInput(0.2f);
+            physics.speed.x += 9 * direction;
+            animator.state = "basic";
+            LockInput(0.4f);
         }
     }
     
@@ -74,18 +77,27 @@ public class ControllerPrincess : PlayerController
     {
         if (currentMagic >= 1 && specialCooldownCurrent <= 0)
         {
-            basicChargeTime = 0;
-            basicCharge = true;
-            animator.special = true;
-            LockInput(0);
+            if (Left())
+                direction = -1;
+            else if (Right())
+                direction = 1;
+            
+            currentMagic -= 1;
+            specialCooldownCurrent = specialCooldown;
+            physics.SetSpeedX(11 * direction, 0.5f);
+            physics.SetSpeedY(jumpHeight / 2, 0);
+            SetInvincible(0.5f);
+            LockInput(0.5f);
+            animator.state = "special";
+            physics.collLayer2 = null;
+            gameObject.layer = 3;
+            Debug.Log(gameObject.layer.ToString());
         }
     }
     
     public override void Damage (int damage, int dir, PlayerController source)
     {
         base.Damage(damage, dir, source);
-        animator.attacking = false;
-        animator.special = false;
         projBasicLeft.Deactivate();
         projBasicRight.Deactivate();
         projChargeLeft.Deactivate();
@@ -96,7 +108,7 @@ public class ControllerPrincess : PlayerController
     public override void UnlockInput ()
     {
         base.UnlockInput();
-        animator.attacking = false;
-        animator.specialFire = false;
+        physics.collLayer2 = "Characters";
+        gameObject.layer = 9;
     }
 }

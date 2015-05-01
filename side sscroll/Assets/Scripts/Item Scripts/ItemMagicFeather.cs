@@ -3,22 +3,7 @@ using System.Collections;
 
 public class ItemMagicFeather : Item
 {
-    
-    protected override void Start ()
-    {
-        base.Start();
-    }
-    
-    protected override void Update ()
-    {
-        base.Update();
-    }
-    
-    protected override void LateUpdate ()
-    {
-        base.LateUpdate();
-    }
-    
+
     public override void OnPickup (PlayerController player)
     {
         base.OnPickup(player);

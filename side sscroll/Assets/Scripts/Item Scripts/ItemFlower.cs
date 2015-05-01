@@ -1,23 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ItemMagicNecklace : Item {
-    
-    protected override void Start ()
-    {
-        base.Start();
-    }
-    
-    protected override void Update ()
-    {
-        base.Update();
-    }
-    
-    protected override void LateUpdate ()
-    {
-        base.LateUpdate();
-    }
-    
+public class ItemFlower : Item
+{
+
     public override void OnPickup (PlayerController player)
     {
         base.OnPickup(player);

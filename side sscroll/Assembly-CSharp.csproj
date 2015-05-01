@@ -39,10 +39,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>L:/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>L:/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -61,16 +61,22 @@
      <Compile Include="Assets\Scripts\CustomPhysics.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\Interface Scripts\PlayerOverhead.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemAxe.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemBluePotion.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemBomb.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemBoomerang.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemBoots.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemBunnyHood.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemFairy.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemFlower.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemGreenPotion.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemHeartContainer.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemLantern.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemMagicArmor.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemMagicFeather.cs" />
-     <Compile Include="Assets\Scripts\Item Scripts\ItemMagicNecklace.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemMagicRing.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemMirror.cs" />
+     <Compile Include="Assets\Scripts\Item Scripts\ItemMirrorShield.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemRedPotion.cs" />
      <Compile Include="Assets\Scripts\Item Scripts\ItemTurkey.cs" />
      <Compile Include="Assets\Scripts\Item.cs" />
@@ -79,13 +85,18 @@
      <Compile Include="Assets\Scripts\PlayerBattleInterfaceScript.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\PlayerPhysics.cs" />
+     <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileAxe.cs" />
+     <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileBomb.cs" />
+     <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileBombExplosion.cs" />
+     <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileBoomerang.cs" />
      <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileHeroArrow.cs" />
+     <Compile Include="Assets\Scripts\Projectile Scripts\ProjectileLanternFire.cs" />
      <Compile Include="Assets\Scripts\Projectile.cs" />
      <Compile Include="Assets\Scripts\ProjectilePhysics.cs" />
      <Compile Include="Assets\Scripts\RangedProjectile.cs" />
      <Compile Include="Assets\Scripts\Stage.cs" />
  <Reference Include="UnityEngine.UI">
- <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ <HintPath>L:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

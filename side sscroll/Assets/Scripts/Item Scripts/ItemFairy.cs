@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ItemFairy : Item {
+public class ItemFairy : Item
+{
 
     protected override void Start ()
     {

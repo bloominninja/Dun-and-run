@@ -4,13 +4,12 @@ using System.Collections;
 public class AnimatorHero : CustomAnimator
 {
     private string currentAnim;
-
+    
     public override void LateUpdate ()
     {
-        base.LateUpdate();
         if (animator != null)
         {
-            if (player.defeated)
+            if (state == "defeated")
             {
                 if (currentAnim != "Defeated")
                 {
@@ -21,7 +20,7 @@ public class AnimatorHero : CustomAnimator
                 }
                 
             }
-            else if (hurt)
+            else if (state == "hurt")
             {
                 if (currentAnim != "Hurt_2" && currentAnim != "Hurt_1")
                 {
@@ -31,7 +30,7 @@ public class AnimatorHero : CustomAnimator
                         currentAnim = "Hurt_2";
                 }
             }
-            else if (attacking)
+            else if (state == "attacking")
             {
                 if (currentAnim != "Attack_2" && currentAnim != "Attack_1")
                 {
@@ -41,11 +40,11 @@ public class AnimatorHero : CustomAnimator
                         currentAnim = "Attack_1";
                 }
             }
-            else if (specialFire)
+            else if (state == "special fire")
             {
                 currentAnim = "Special_Fire";
             }
-            else if (special)
+            else if (state == "special")
             {
                 currentAnim = "Special";
             }
@@ -67,6 +66,35 @@ public class AnimatorHero : CustomAnimator
                 currentAnim = "Idle";
             }
             animator.Play(currentAnim);
+        }
+        base.LateUpdate();
+
+        if (state == "special" && player.specialChargeTime == player.specialChargeTimeMax)
+        {
+            whiteTimer -= Time.deltaTime;
+            if (whiteTimer <= 0)
+            {
+                whiteToggle = !whiteToggle;
+                opacityTimer = 0.2f;
+            }
+        }
+        else
+        {
+            whiteTimer = 0.2f;
+            whiteToggle = false;
+        }
+
+        
+        if (whiteToggle)
+        {
+            foreach (Sprite s in whiteSheet)
+            {
+                if (s.name == rend.sprite.name)
+                {
+                    rend.sprite = s;
+                    break;
+                }
+            }
         }
     }
 }

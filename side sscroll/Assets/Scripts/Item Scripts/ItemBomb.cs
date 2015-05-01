@@ -1,30 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ItemBomb : ActiveItem {
-    
+public class ItemBomb : ActiveItem
+{ 
+    public ProjectileBomb projectile, prefab;
+
     protected override void Start ()
     {
         base.Start();
+        cooldown = 7;
+        cost = 2;
     }
-    
-    protected override void Update ()
+
+    public override void Activate (PlayerController player)
     {
-        base.Update();
-    }
-    
-    protected override void LateUpdate ()
-    {
-        base.LateUpdate();
-    }
-    
-    public override void OnPickup (PlayerController player)
-    {
-        base.OnPickup(player);
-    }
-    
-    public override void OnDrop (PlayerController player)
-    {
-        base.OnDrop(player);
+        projectile = (ProjectileBomb)Instantiate(prefab);
+        projectile.transform.position = player.transform.position + (Vector3)player.box.offset + (Vector3)(box.size / 2);
+        projectile.direction = player.direction;
+        projectile.team = player.team;
     }
 }

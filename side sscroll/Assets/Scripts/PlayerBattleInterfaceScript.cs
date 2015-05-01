@@ -5,28 +5,30 @@ using UnityEngine.UI;
 public class PlayerBattleInterfaceScript : MonoBehaviour
 {
     public PlayerController connectedPlayer = null;
-	
+    
     public Sprite[] healthSpriteArray;
     public Sprite[] manaSpriteArray;
-
+    
     protected Component[] images;
-	
+    
     CanvasGroup ourCanvas = null;
-
+    
     Vector3 v;
 
+    public Sprite h1, h2, p1, p2, s1, s2;
+    
     // Use this for initialization
     void Start ()
     {
         ourCanvas = this.GetComponent<CanvasGroup>();
         
         images = GetComponentsInChildren<Image>();
-
+        
         if (connectedPlayer == null)
         {
             //hide ourself
             ourCanvas.alpha = 0;
-			
+            
             //abort if we don't have player data
             return;
         }
@@ -34,28 +36,28 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
         {
             //healthSpriteArray = Resources.LoadAll<Sprite> ("health");
             //manaSpriteArray = Resources.LoadAll<Sprite> ("mana");
-			
+            
             //Component[] texts = GetComponentsInChildren<Text>();
             //nameField = Text.Find("NameField");
-
+            
             //foreach (Text e in texts)
             {
                 //if (e.name == "HealthField")
                 //e.text = ""+connectedPlayer.currentHealth;
             }
         }
-		
+        
     }
-	
+    
     // Update is called once per frame
     void Update ()
     {
         if (connectedPlayer != null)
         {
             ourCanvas.alpha = 1;
-			
+            
             //nameField = Text.Find("NameField");
-
+            
             foreach (Image e in images)
             {
                 if (e.name == "HealthHeart1")
@@ -232,10 +234,11 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
                     if (connectedPlayer.basicCooldownCurrent <= 0)
                         v.y = 0;
                     else
-                        v.y = 1.2f*connectedPlayer.basicCooldownCurrent/connectedPlayer.basicCooldown;
+                        v.y = 1.2f * connectedPlayer.basicCooldownCurrent / connectedPlayer.basicCooldown;
+                    v.y = Mathf.Min(v.y, 1.2f);
                     e.rectTransform.localScale = v;
                     v = e.rectTransform.localPosition;
-                    v.y=-60+60*connectedPlayer.basicCooldownCurrent/connectedPlayer.basicCooldown;
+                    v.y = -60 + 60 * connectedPlayer.basicCooldownCurrent / connectedPlayer.basicCooldown;
                     e.rectTransform.localPosition = v;
                 }
                 else if (e.name == "Special Cooldown")
@@ -244,10 +247,11 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
                     if (connectedPlayer.specialCooldownCurrent <= 0)
                         v.y = 0;
                     else
-                        v.y = 1.2f*connectedPlayer.specialCooldownCurrent/connectedPlayer.specialCooldown;
+                        v.y = 1.2f * connectedPlayer.specialCooldownCurrent / connectedPlayer.specialCooldown;
+                    v.y = Mathf.Min(v.y, 1.2f);
                     e.rectTransform.localScale = v;
                     v = e.rectTransform.localPosition;
-                    v.y=-60+60*connectedPlayer.specialCooldownCurrent/connectedPlayer.specialCooldown;
+                    v.y = -60 + 60 * connectedPlayer.specialCooldownCurrent / connectedPlayer.specialCooldown;
                     e.rectTransform.localPosition = v;
                 }
                 else if (e.name == "Active 1 Cooldown")
@@ -256,11 +260,13 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
                     if (connectedPlayer.active1CooldownCurrent <= 0)
                         v.y = 0;
                     else
-                        v.y = 1.2f*connectedPlayer.active1CooldownCurrent/connectedPlayer.active1.cooldown;
+                        v.y = 1.2f * connectedPlayer.active1CooldownCurrent / connectedPlayer.active1.cooldown;
+                    v.y = Mathf.Min(v.y, 1.2f);
                     e.rectTransform.localScale = v;
-                    if(connectedPlayer.active1 == null) continue;
+                    if (connectedPlayer.active1 == null)
+                        continue;
                     v = e.rectTransform.localPosition;
-                    v.y=-60+60*connectedPlayer.active1CooldownCurrent/connectedPlayer.active1.cooldown;
+                    v.y = -60 + 60 * connectedPlayer.active1CooldownCurrent / connectedPlayer.active1.cooldown;
                     e.rectTransform.localPosition = v;
                 }
                 else if (e.name == "Active 2 Cooldown")
@@ -269,13 +275,49 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
                     if (connectedPlayer.active2CooldownCurrent <= 0)
                         v.y = 0;
                     else
-                        v.y = 1.2f*connectedPlayer.active2CooldownCurrent/connectedPlayer.active2.cooldown;
+                        v.y = 1.2f * connectedPlayer.active2CooldownCurrent / connectedPlayer.active2.cooldown;
+                    v.y = Mathf.Min(v.y, 1.2f);
                     e.rectTransform.localScale = v;
-                    if(connectedPlayer.active2 == null) continue;
+                    if (connectedPlayer.active2 == null)
+                        continue;
                     v = e.rectTransform.localPosition;
-                    v.y=-60+60*connectedPlayer.active2CooldownCurrent/connectedPlayer.active2.cooldown;
+                    v.y = -60 + 60 * connectedPlayer.active2CooldownCurrent / connectedPlayer.active2.cooldown;
                     e.rectTransform.localPosition = v;
                 }
+                /*else if (e.name == "Basic")
+                {
+                    if (connectedPlayer.active1 != null)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        if (connectedPlayer.id == 1)
+                            e.sprite = h1;
+                        else if (connectedPlayer.id == 2)
+                            e.sprite = p1;
+                        else
+                            e.sprite = s1;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }
+                else if (e.name == "Special")
+                {
+                    if (connectedPlayer.active1 != null)
+                    {
+                        e.GetComponent<Image>().color = Color.white;
+                        if (connectedPlayer.id == 1)
+                            e.sprite = h2;
+                        else if (connectedPlayer.id == 2)
+                            e.sprite = p2;
+                        else
+                            e.sprite = s2;
+                    }
+                    else
+                    {
+                        e.GetComponent<Image>().color = Color.clear;
+                    }
+                }*/
                 else if (e.name == "Active 1")
                 {
                     if (connectedPlayer.active1 != null)
@@ -361,7 +403,7 @@ public class PlayerBattleInterfaceScript : MonoBehaviour
                     }
                 }
             }
-
+            
         }
         else
         {

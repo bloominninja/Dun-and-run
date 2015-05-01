@@ -14,8 +14,9 @@ public class CustomPhysics : MonoBehaviour
     public float gravity = 15;
     public bool gravEnabled = true;
     public float friction = 5;
-    public bool lockX;
-    public bool lockY;
+    public bool lockX, setX;
+    public bool lockY, setY;
+    public float setXSpeed, setYSpeed;
     protected float lockXTime;
     protected float lockYTime;
     public bool collideRight, collideLeft, collideTop, collideBottom, collide;
@@ -34,7 +35,7 @@ public class CustomPhysics : MonoBehaviour
     [HideInInspector]
     protected int
         i, i2, originalLayer;
-
+    
     protected virtual void Start ()
     {
         box = GetComponent<BoxCollider2D>();
@@ -44,7 +45,7 @@ public class CustomPhysics : MonoBehaviour
         temp.z = 0;
         transform.position = temp;
     }
-
+    
     protected virtual void Update ()
     {
         if (GameManager.o.pause)
@@ -53,16 +54,20 @@ public class CustomPhysics : MonoBehaviour
         {
             lockXTime -= Time.deltaTime;
             if (lockXTime <= 0)
+            {
                 lockX = false;
+            }
         }
         if (lockY)
         {
             lockYTime -= Time.deltaTime;
             if (lockYTime <= 0)
+            {
                 lockY = false;
+            }
         }
     }
-
+    
     public virtual void Move (Vector2 target)
     {
         collide = false;
@@ -70,23 +75,33 @@ public class CustomPhysics : MonoBehaviour
         collideLeft = false;
         collideTop = false;
         collideBottom = false;
-
+        
         if (!lockX)
         {
-            if (collideBottom && ((target.x == 0 && Mathf.Abs(speed.x) > 1) || (target.x != 0 && Mathf.Sign(speed.x) != Mathf.Sign(target.x))))
+            if (setX)
+            {
+                speed.x = setXSpeed;
+                setX = false;
+            }
+            else if (collideBottom && ((target.x == 0 && Mathf.Abs(speed.x) > 1) || (target.x != 0 && Mathf.Sign(speed.x) != Mathf.Sign(target.x))))
                 speed.x = Accelerate(speed.x, target.x - friction * Mathf.Sign(speed.x));
             else
                 speed.x = Accelerate(speed.x, target.x);
         }
         if (!lockY)
         {
-            if (gravEnabled)
+            if (setY)
+            {
+                speed.y = setYSpeed;
+                setY = false;
+            }
+            else if (gravEnabled)
                 speed.y = Accelerate(speed.y, target.y - gravity);
             else
                 speed.y = Accelerate(speed.y, target.y);
         }
         sp = speed * Time.deltaTime;
-
+        
         originalLayer = gameObject.layer;
         gameObject.layer = 2;
         #region Vertical Collisions
@@ -108,7 +123,7 @@ public class CustomPhysics : MonoBehaviour
             }
         }
         #endregion
-
+        
         #region Horizontal Collisions
         //check for horizontal collision
         if (sp.x != 0)
@@ -128,7 +143,7 @@ public class CustomPhysics : MonoBehaviour
             }
         }
         #endregion
-
+        
         #region Digonal Collision
         //check for diagonal collisions
         if (!collide && sp.x != 0 && sp.y != 0)
@@ -145,11 +160,11 @@ public class CustomPhysics : MonoBehaviour
         }
         #endregion
         gameObject.layer = originalLayer;
-
+        
         transform.Translate(sp, Space.World);
-
+        
     }
-
+    
     protected float Accelerate (float current, float target)
     {
         float accel = Mathf.Max(10, 5 * Mathf.Abs(target - current));
@@ -172,7 +187,7 @@ public class CustomPhysics : MonoBehaviour
             }
         }
     }
-
+    
     protected virtual bool CollideH ()
     {
         for (i2=0; i2<hits.Length; i2++)
@@ -183,7 +198,7 @@ public class CustomPhysics : MonoBehaviour
             else
                 collideLeft = true;
             lockX = false;
-        
+            
             float dst = Vector2.Distance(ray.origin, hits[i2].point);
             if (dst > skin)
             {
@@ -198,7 +213,7 @@ public class CustomPhysics : MonoBehaviour
         }
         return true;
     }
-
+    
     protected virtual bool CollideV ()
     {
         for (i2=0; i2<hits.Length; i2++)
@@ -209,7 +224,7 @@ public class CustomPhysics : MonoBehaviour
             else
                 collideBottom = true;
             lockY = false;
-        
+            
             float dst = Vector3.Distance(ray.origin, hits[i2].point);
             if (dst > skin)
             {
@@ -224,7 +239,7 @@ public class CustomPhysics : MonoBehaviour
         }
         return true;
     }
-
+    
     protected virtual bool CollideD ()
     {
         for (i2=0; i2<hits.Length; i2++)
@@ -243,11 +258,29 @@ public class CustomPhysics : MonoBehaviour
         lockY = true;
         lockYTime = time;
     }
-
+    
     public void SetSpeedX (float target, float time)
     {
         speed.x = target;
         lockX = true;
         lockXTime = time;
+    }
+    
+    public void SetSpeedY (float target, float time, float end)
+    {
+        speed.y = target;
+        lockY = true;
+        lockYTime = time;
+        setY = true;
+        setYSpeed = end;
+    }
+    
+    public void SetSpeedX (float target, float time, float end)
+    {
+        speed.x = target;
+        lockX = true;
+        lockXTime = time;
+        setX = true;
+        setXSpeed = end;
     }
 }

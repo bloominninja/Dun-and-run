@@ -1,0 +1,473 @@
+fileFormatVersion: 2
+guid: fa91ac4263216a04689e3d10c1d22977
+timeCreated: 1430438600
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Soldier_White_0
+    21300002: Soldier_White_1
+    21300004: Soldier_White_2
+    21300006: Soldier_White_3
+    21300008: Soldier_White_4
+    21300010: Soldier_White_5
+    21300012: Soldier_White_6
+    21300014: Soldier_White_7
+    21300016: Soldier_White_8
+    21300018: Soldier_White_9
+    21300020: Soldier_White_10
+    21300022: Soldier_White_11
+    21300024: Soldier_White_12
+    21300026: Soldier_White_13
+    21300028: Soldier_White_14
+    21300030: Soldier_White_15
+    21300032: Soldier_White_16
+    21300034: Soldier_White_17
+    21300036: Soldier_White_18
+    21300038: Soldier_White_19
+    21300040: Soldier_White_20
+    21300042: Soldier_White_21
+    21300044: Soldier_White_22
+    21300046: Soldier_White_23
+    21300048: Soldier_White_24
+    21300050: Soldier_White_25
+    21300052: Soldier_White_26
+    21300054: Soldier_White_27
+    21300056: Soldier_White_28
+    21300058: Soldier_White_29
+    21300060: Soldier_White_30
+    21300062: Soldier_White_31
+    21300064: Soldier_White_32
+    21300066: Soldier_White_33
+    21300068: Soldier_White_34
+    21300070: Soldier_White_35
+    21300072: Soldier_White_36
+    21300074: Soldier_White_37
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: Soldier_White_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 700
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_1
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 700
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_2
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 700
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_3
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 700
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_4
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 700
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 600
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_6
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 600
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_7
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 600
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_8
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 600
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_9
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 600
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 500
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_11
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 500
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_12
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 500
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_13
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 500
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_14
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 500
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_15
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 400
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_16
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 400
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_17
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 400
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_18
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 400
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_19
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 400
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 300
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_21
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 300
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_22
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 300
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_23
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 300
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_24
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 300
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_25
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 200
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_26
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 200
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_27
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 200
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_28
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 200
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_29
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 200
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_30
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 100
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_31
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 100
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_32
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 100
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_33
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 100
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_34
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 100
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_35
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_36
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 0
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Soldier_White_37
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 0
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

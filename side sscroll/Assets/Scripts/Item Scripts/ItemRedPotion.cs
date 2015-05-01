@@ -7,7 +7,7 @@ public class ItemRedPotion : ActiveItem
     protected override void Start ()
     {
         base.Start();
-        cooldown = 20;
+        cooldown = 40;
         cost = 0;
     }
     

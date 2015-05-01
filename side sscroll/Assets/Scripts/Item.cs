@@ -18,6 +18,8 @@ public class Item : MonoBehaviour
     //51 = red potion; 52 = blue potion; 53 = green potion; 
     public int id = 0;
 
+    protected float countdown = 0.7f;
+
     // Use this for initialization
     protected virtual void Start ()
     {
@@ -39,12 +41,19 @@ public class Item : MonoBehaviour
         if (!held && !inChest)
         {
             GetComponent<Renderer>().enabled = true;
-            foreach (PlayerController i in GameManager.o.players)
+            if (countdown > 0)
             {
-                if (box.bounds.Intersects(i.box.bounds))
+                countdown -= Time.deltaTime;
+            }
+            else
+            {
+                foreach (PlayerController i in GameManager.o.players)
                 {
-                    if (i.Pickup(this))
-                        break;
+                    if (box.bounds.Intersects(i.box.bounds))
+                    {
+                        if (i.Pickup(this))
+                            break;
+                    }
                 }
             }
         }
